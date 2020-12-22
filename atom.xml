@@ -3,11 +3,11 @@
   <title>DxBlog</title>
   
   
-  <link href="http://example.com/atom.xml" rel="self"/>
+  <link href="https://dxblog.top/atom.xml" rel="self"/>
   
-  <link href="http://example.com/"/>
+  <link href="https://dxblog.top/"/>
   <updated>2020-12-22T05:49:09.309Z</updated>
-  <id>http://example.com/</id>
+  <id>https://dxblog.top/</id>
   
   <author>
     <name>Egan Dong</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>20201222_每天一个小知识</title>
-    <link href="http://example.com/2020/12/22/20201222-%E6%AF%8F%E5%A4%A9%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A5%E8%AF%86/"/>
-    <id>http://example.com/2020/12/22/20201222-%E6%AF%8F%E5%A4%A9%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A5%E8%AF%86/</id>
+    <link href="https://dxblog.top/2020/12/22/20201222-%E6%AF%8F%E5%A4%A9%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A5%E8%AF%86/"/>
+    <id>https://dxblog.top/2020/12/22/20201222-%E6%AF%8F%E5%A4%A9%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A5%E8%AF%86/</id>
     <published>2020-12-22T05:46:57.000Z</published>
     <updated>2020-12-22T05:49:09.309Z</updated>
     
@@ -27,14 +27,14 @@
     
     
     
-    <category term="日常" scheme="http://example.com/tags/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://dxblog.top/tags/%E6%97%A5%E5%B8%B8/"/>
     
   </entry>
   
   <entry>
     <title>Test</title>
-    <link href="http://example.com/2020/10/22/firstPage/"/>
-    <id>http://example.com/2020/10/22/firstPage/</id>
+    <link href="https://dxblog.top/2020/10/22/firstPage/"/>
+    <id>https://dxblog.top/2020/10/22/firstPage/</id>
     <published>2020-10-22T03:10:47.000Z</published>
     <updated>2020-12-22T05:40:33.638Z</updated>
     
@@ -51,7 +51,7 @@
     
     
     
-    <category term="Test" scheme="http://example.com/tags/Test/"/>
+    <category term="Test" scheme="https://dxblog.top/tags/Test/"/>
     
   </entry>
   
