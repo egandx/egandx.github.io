@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://dxblog.top/2020/12/22/20201222-%E6%AF%8F%E5%A4%A9%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A5%E8%AF%86/</loc>
+    
+    <lastmod>2020-12-23</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://dxblog.top/link/index.html</loc>
     
     <lastmod>2020-12-22</lastmod>
@@ -23,13 +30,6 @@
   </url>
   
   <url>
-    <loc>https://dxblog.top/2020/12/22/20201222-%E6%AF%8F%E5%A4%A9%E4%B8%80%E4%B8%AA%E5%B0%8F%E7%9F%A5%E8%AF%86/</loc>
-    
-    <lastmod>2020-12-22</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://dxblog.top/2020/10/22/firstPage/</loc>
     
     <lastmod>2020-12-22</lastmod>
@@ -39,7 +39,7 @@
 
   <url>
     <loc>https://dxblog.top/</loc>
-    <lastmod>2020-12-22</lastmod>
+    <lastmod>2020-12-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -47,18 +47,39 @@
   
   <url>
     <loc>https://dxblog.top/tags/Test/</loc>
-    <lastmod>2020-12-22</lastmod>
+    <lastmod>2020-12-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>https://dxblog.top/tags/%E6%97%A5%E5%B8%B8/</loc>
-    <lastmod>2020-12-22</lastmod>
+    <lastmod>2020-12-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://dxblog.top/tags/%E6%9D%82%E8%AE%B0/</loc>
+    <lastmod>2020-12-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
 
+  
+  <url>
+    <loc>https://dxblog.top/categories/%E6%97%A5%E5%B8%B8/</loc>
+    <lastmod>2020-12-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://dxblog.top/categories/%E6%97%A5%E5%B8%B8/%E5%B7%A5%E4%BD%9C/</loc>
+    <lastmod>2020-12-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
   
 </urlset>
