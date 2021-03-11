@@ -2,16 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://dxblog.top/2021/03/02/Basic%20calculator%20II/</loc>
+    <loc>https://dxblog.top/2021/03/01/Reverse%20Polish%20notation/</loc>
     
     <lastmod>2021-03-11</lastmod>
     
   </url>
   
   <url>
-    <loc>https://dxblog.top/2021/03/01/Reverse%20Polish%20notation/</loc>
+    <loc>https://dxblog.top/2021/03/02/Basic%20calculator%20II/</loc>
     
-    <lastmod>2021-03-10</lastmod>
+    <lastmod>2021-03-11</lastmod>
     
   </url>
   
@@ -117,13 +117,6 @@
   
   <url>
     <loc>https://dxblog.top/tags/Leetcode/</loc>
-    <lastmod>2021-03-11</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://dxblog.top/tags/Reverse-Polish-notation/</loc>
     <lastmod>2021-03-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
