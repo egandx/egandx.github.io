@@ -1,35 +1,210 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
   <url>
-    <loc>https://eganblog.com/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/</loc>
-    <lastmod>2022-01-19</lastmod>
-  </url>
+    <loc>https://eganblog.com/2021/03/02/Basic%2520calculator%2520II/</loc>
+    <lastmod>2022-01-20T11:36:46.499Z</lastmod>
+    <data>
+        <display>
+        <title>基础计算器II (Basic calculator II)</title>
+        <pubTime>2021-03-02T02:22:11.000Z</pubTime>
+        
+        <tag>日常 </tag>
+         
+        <tag>C++ </tag>
+         
+        <tag>Leetcode </tag>
+         
+        <tag>栈 </tag>
+         
+         
+           
+             
+              <breadCrumb title="算法" url="https://eganblog.com/categories/%25E7%25AE%2597%25E6%25B3%2595/"/>
+          
+             
+              <breadCrumb title="Leetcode" url="https://eganblog.com/categories/%25E7%25AE%2597%25E6%25B3%2595/Leetcode/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
   <url>
-    <loc>https://eganblog.com/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/</loc>
-    <lastmod>2022-01-19</lastmod>
-  </url>
+    <loc>https://eganblog.com/2021/03/09/%25E5%258D%258E%25E4%25B8%25BAOD%25E7%25AC%2594%25E8%25AF%2595/</loc>
+    <lastmod>2022-01-20T11:36:38.632Z</lastmod>
+    <data>
+        <display>
+        <title>华为OD笔试</title>
+        <pubTime>2021-03-09T03:30:12.000Z</pubTime>
+        
+        <tag>C++ </tag>
+         
+        <tag>华为OD </tag>
+         
+        <tag>笔试 </tag>
+         
+         
+           
+             
+              <breadCrumb title="日常" url="https://eganblog.com/categories/%25E6%2597%25A5%25E5%25B8%25B8/"/>
+          
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E6%2597%25A5%25E5%25B8%25B8/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
   <url>
     <loc>https://eganblog.com/2020/12/22/Six_months_after_graduation/</loc>
-    <lastmod>2021-09-29</lastmod>
-  </url>
+    <lastmod>2022-01-20T11:36:33.880Z</lastmod>
+    <data>
+        <display>
+        <title>毕业半年的自己</title>
+        <pubTime>2020-12-22T05:46:57.000Z</pubTime>
+        
+        <tag>日常 </tag>
+         
+        <tag>杂记 </tag>
+         
+         
+           
+             
+              <breadCrumb title="日常" url="https://eganblog.com/categories/%25E6%2597%25A5%25E5%25B8%25B8/"/>
+          
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E6%2597%25A5%25E5%25B8%25B8/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
   <url>
-    <loc>https://eganblog.com/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/</loc>
-    <lastmod>2021-09-29</lastmod>
-  </url>
+    <loc>https://eganblog.com/2021/03/01/Reverse%2520Polish%2520notation/</loc>
+    <lastmod>2022-01-20T11:36:29.903Z</lastmod>
+    <data>
+        <display>
+        <title>逆波兰表示法(Reverse Polish notation)</title>
+        <pubTime>2021-03-01T08:12:14.000Z</pubTime>
+        
+        <tag>日常 </tag>
+         
+        <tag>C++ </tag>
+         
+        <tag>Leetcode </tag>
+         
+        <tag>栈 </tag>
+         
+         
+           
+             
+              <breadCrumb title="算法" url="https://eganblog.com/categories/%25E7%25AE%2597%25E6%25B3%2595/"/>
+          
+             
+              <breadCrumb title="Leetcode" url="https://eganblog.com/categories/%25E7%25AE%2597%25E6%25B3%2595/Leetcode/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
   <url>
-    <loc>https://eganblog.com/2021/03/01/Reverse%20Polish%20notation/</loc>
-    <lastmod>2021-03-11</lastmod>
-  </url>
-  <url>
-    <loc>https://eganblog.com/2021/03/02/Basic%20calculator%20II/</loc>
-    <lastmod>2021-03-11</lastmod>
-  </url>
-  <url>
-    <loc>https://eganblog.com/2021/02/22/Ming's%20random%20numbers/</loc>
-    <lastmod>2021-03-10</lastmod>
-  </url>
+    <loc>https://eganblog.com/2021/02/22/Ming's%2520random%2520numbers/</loc>
+    <lastmod>2022-01-20T11:36:25.742Z</lastmod>
+    <data>
+        <display>
+        <title>Ming's random numbers</title>
+        <pubTime>2021-02-22T05:46:57.000Z</pubTime>
+        
+        <tag>日常 </tag>
+         
+        <tag>C++ </tag>
+         
+        <tag>Leetcode </tag>
+         
+        <tag>sort </tag>
+         
+        <tag>unique </tag>
+         
+         
+           
+             
+              <breadCrumb title="算法" url="https://eganblog.com/categories/%25E7%25AE%2597%25E6%25B3%2595/"/>
+          
+             
+              <breadCrumb title="Leetcode" url="https://eganblog.com/categories/%25E7%25AE%2597%25E6%25B3%2595/Leetcode/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
   <url>
     <loc>https://eganblog.com/2020/10/22/firstPage/</loc>
-    <lastmod>2021-03-04</lastmod>
-  </url>
-</urlset> 
+    <lastmod>2022-01-20T11:36:20.632Z</lastmod>
+    <data>
+        <display>
+        <title>Test</title>
+        <pubTime>2020-10-22T03:10:47.000Z</pubTime>
+        
+        <tag>Test </tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://eganblog.com/2022/01/03/CSharp%25E5%2586%2585%25E5%25AD%2598%25E6%25BA%25A2%25E5%2587%25BA/</loc>
+    <lastmod>2022-01-20T11:36:16.295Z</lastmod>
+    <data>
+        <display>
+        <title>C#内存泄露</title>
+        <pubTime>2022-01-03T04:31:19.000Z</pubTime>
+        
+        <tag>C# </tag>
+         
+        <tag>OOM </tag>
+         
+         
+           
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://eganblog.com/2022/01/01/CSharp%25E4%25B8%25B2%25E5%258F%25A3%25E8%25AF%25BB%25E5%2586%2599%25E8%25BF%259E%25E7%25BB%25AD%25E6%2580%25A7%25E9%2597%25AE%25E9%25A2%2598/</loc>
+    <lastmod>2022-01-20T11:36:11.530Z</lastmod>
+    <data>
+        <display>
+        <title>C#串口读写连续性问题</title>
+        <pubTime>2022-01-01T03:31:19.000Z</pubTime>
+        
+        <tag>C# </tag>
+         
+        <tag>Serial </tag>
+         
+         
+           
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+    
+    
+</urlset>
