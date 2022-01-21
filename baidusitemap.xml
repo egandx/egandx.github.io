@@ -3,6 +3,72 @@
 
     
   <url>
+    <loc>https://eganblog.com/2022/01/05/Go%25E7%2589%2588%25E6%259C%25AC%25E5%2588%2587%25E6%258D%25A2/</loc>
+    <lastmod>2022-01-21T09:25:38.625Z</lastmod>
+    <data>
+        <display>
+        <title>Go版本切换</title>
+        <pubTime>2022-01-05T13:06:11.000Z</pubTime>
+        
+        <tag>go </tag>
+         
+        <tag>版本切换 </tag>
+         
+         
+           
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://eganblog.com/2022/01/03/CSharp%25E5%2586%2585%25E5%25AD%2598%25E6%25BA%25A2%25E5%2587%25BA/</loc>
+    <lastmod>2022-01-21T09:25:11.138Z</lastmod>
+    <data>
+        <display>
+        <title>C#内存泄露</title>
+        <pubTime>2022-01-03T04:31:19.000Z</pubTime>
+        
+        <tag>C# </tag>
+         
+        <tag>OOM </tag>
+         
+         
+           
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://eganblog.com/2022/01/01/CSharp%25E4%25B8%25B2%25E5%258F%25A3%25E8%25AF%25BB%25E5%2586%2599%25E8%25BF%259E%25E7%25BB%25AD%25E6%2580%25A7%25E9%2597%25AE%25E9%25A2%2598/</loc>
+    <lastmod>2022-01-21T09:25:09.421Z</lastmod>
+    <data>
+        <display>
+        <title>C#串口读写连续性问题</title>
+        <pubTime>2022-01-01T03:31:19.000Z</pubTime>
+        
+        <tag>C# </tag>
+         
+        <tag>Serial </tag>
+         
+         
+           
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://eganblog.com/2021/03/02/Basic%2520calculator%2520II/</loc>
     <lastmod>2022-01-20T11:36:46.499Z</lastmod>
     <data>
@@ -155,50 +221,6 @@
          
          
            
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://eganblog.com/2022/01/03/CSharp%25E5%2586%2585%25E5%25AD%2598%25E6%25BA%25A2%25E5%2587%25BA/</loc>
-    <lastmod>2022-01-20T11:36:16.295Z</lastmod>
-    <data>
-        <display>
-        <title>C#内存泄露</title>
-        <pubTime>2022-01-03T04:31:19.000Z</pubTime>
-        
-        <tag>C# </tag>
-         
-        <tag>OOM </tag>
-         
-         
-           
-             
-              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://eganblog.com/2022/01/01/CSharp%25E4%25B8%25B2%25E5%258F%25A3%25E8%25AF%25BB%25E5%2586%2599%25E8%25BF%259E%25E7%25BB%25AD%25E6%2580%25A7%25E9%2597%25AE%25E9%25A2%2598/</loc>
-    <lastmod>2022-01-20T11:36:11.530Z</lastmod>
-    <data>
-        <display>
-        <title>C#串口读写连续性问题</title>
-        <pubTime>2022-01-01T03:31:19.000Z</pubTime>
-        
-        <tag>C# </tag>
-         
-        <tag>Serial </tag>
-         
-         
-           
-             
-              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
-          
         </display>
     </data>
     </url>
