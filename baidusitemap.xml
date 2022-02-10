@@ -3,6 +3,28 @@
 
     
   <url>
+    <loc>https://eganblog.com/2022/02/08/CSharp%2520GC%25E6%259C%25BA%25E5%2588%25B6/</loc>
+    <lastmod>2022-02-10T13:36:57.959Z</lastmod>
+    <data>
+        <display>
+        <title>C# GC机制</title>
+        <pubTime>2022-02-08T13:31:19.000Z</pubTime>
+        
+        <tag>C# </tag>
+         
+        <tag>GC </tag>
+         
+         
+           
+             
+              <breadCrumb title="工作" url="https://eganblog.com/categories/%25E5%25B7%25A5%25E4%25BD%259C/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://eganblog.com/2022/01/05/Go%25E7%2589%2588%25E6%259C%25AC%25E5%2588%2587%25E6%258D%25A2/</loc>
     <lastmod>2022-01-21T09:25:38.625Z</lastmod>
     <data>

@@ -6,7 +6,7 @@
   <link href="https://eganblog.com/atom.xml" rel="self"/>
   
   <link href="https://eganblog.com/"/>
-  <updated>2022-01-21T09:25:38.625Z</updated>
+  <updated>2022-02-10T13:36:57.959Z</updated>
   <id>https://eganblog.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>C# GC机制</title>
+    <link href="https://eganblog.com/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/"/>
+    <id>https://eganblog.com/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/</id>
+    <published>2022-02-08T13:31:19.000Z</published>
+    <updated>2022-02-10T13:36:57.959Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="C-GC机制-Garbage-Collector"><a href="#C-GC机制-Garbage-Collector" class="headerlink" title="C# GC机制(Garbage Collector)"></a>C# GC机制(Garbage Collector)</h3><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>记录一下C#中GC的相关知识。不记下来，下次又找不到，就很烦。</p><h4 id="1、资源概念"><a href="#1、资源概念" class="headerlink" title="1、资源概念"></a>1、资源概念</h4><p>所谓的资源其实就是程序中可以利用的数据。比如字符串、图片和任何的二进制数据。</p><p>托管资源，非托管资源：托管资源是由CLR全权负责的资源，CLR不负责的资源位非托管资源。<br><strong>对于托管资源通过GC自动清理回收。对于非托管的资源，一般就是Stream，数据库的连接，网络连接，GDI+的相关对象，还有Com对象等等这些操作系统资源，需要我们手动去释放，再由GC回收。</strong>  </p><h4 id="2、Garbage的判定"><a href="#2、Garbage的判定" class="headerlink" title="2、Garbage的判定"></a>2、Garbage的判定</h4><p>.Net类型分为两大类，<strong>一个就是值类型，另一个就是引用类型。前者是在堆栈中分配内存，它们有自身的生命周期，所以不用对它们进行管理，会自动分配和释放。后者是在堆中分配内存的。所以它的分配和释放就需要像回收机制来管理。</strong></p><p>GC的全称为“Garbage Collector”,顾名思义就是垃圾回收器，那么只有被称为垃圾的对象才能被GC回收。也就是说， 一个引用类型对象所占用的内存需要被GC回收，需要先成为垃圾。 <strong>.Net判定一个引用类型对象是垃圾，只需要判定此对象或者其包含的子对象没有任何引用是有效的，那么系统就认为它是垃圾。</strong></p><h4 id="3、非托管资源的释放方式"><a href="#3、非托管资源的释放方式" class="headerlink" title="3、非托管资源的释放方式"></a>3、非托管资源的释放方式</h4><h5 id="3-1-Close"><a href="#3-1-Close" class="headerlink" title="3.1 Close()"></a>3.1 Close()</h5><p>关闭对象资源，在显示调用时被调用。</p><h5 id="3-2-Dispose"><a href="#3-2-Dispose" class="headerlink" title="3.2 Dispose()"></a>3.2 Dispose()</h5><p>继承IDisposable接口，实现Dispose方法；<br>介绍：调用Dispose方法，销毁对象，需要显示调用或者通过using语句，在显示调用或者离开using程序块时被调用。<br>Dispose方法用于清理对象封装的非托管资源，而不是释放对象的内存，对象的内存依然由垃圾回收器控制。<br>Dispose方法调用，不但释放该类的非托管资源，还释放了引用的类的非托管资源。<br>Dispose模式就是一种强制资源清理所要遵守的约定；Dispose模式实现IDisposable接口，从而使得该类型提供一个公有的Dispose方法。</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">而Close与Dispose这两种方法的区别在于，调用完了对象的Close方法后，此对象有可能被重新进</span><br><span class="line">行使用；而Dispose方法来说，此对象所占有的资源需要被标记为无用了，也就是此对象被销毁了，</span><br><span class="line">不能再被使用。</span><br></pre></td></tr></table></figure><h5 id="3-3-析构函数-Finalize"><a href="#3-3-析构函数-Finalize" class="headerlink" title="3.3 析构函数/Finalize()"></a>3.3 析构函数/Finalize()</h5><p>带有析构函数的类，生命周期会变长。内存空间需要两次垃圾回收才会被释放，导致性能下降。</p><p>一个正常情况的类是不会写析构函数的，而一旦一个类写了析构函数，就意味着GC会在不确定的时间调用该类的析构函数，判断该类的资源是否需要释放，然后调用Finalize方法，如果重写了Finalize方法则调用重写的Finalize方法。<br>Finalize方法的作用是保证.NET对象能在垃圾回收时清除非托管资源。<br>在.NET中，Object.Finalize()方法是无法重载的，编译器是根据类的析构函数来自动生成Object.Finalize()方法的<br>Finalize由垃圾回收器调用；dispose由对象调用。<br>Finalize无需担心因为没有调用Finalize而使非托管资源得不到释放，因为GC会在不确定时间调用，当然，你也可以手动调用Finalize方法，而dispose必须手动调用。<br>Finalize虽然无需担心因为没有调用Finalize而使非托管资源得不到释放，但因为由垃圾回收器管理，不能保证立即释放非托管资源；而dispose一调用便释放非托管资源。<br>只有类类型才能重写Finalize，而结构不能；类和结构都能实现IDispose</p><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">释放模式：是一种微软建议的写法，先手动显示去释放资源，如果忘记了，再让finalize释放资源。</span><br><span class="line">所以如果已经完成了析构函数该干的事情(例如释放非托管资源)，就应当使用SuppressFinalize</span><br><span class="line">方法告诉GC不需要再执行某个对象的析构函数。</span><br></pre></td></tr></table></figure><h4 id="4、GC的运作方式"><a href="#4、GC的运作方式" class="headerlink" title="4、GC的运作方式"></a>4、GC的运作方式</h4><p>内存的释放和回收需要伴随着程序的运行，因此系统为GC安排了独立的线程。那么GC的工作大致是，查询内存中对象是否成为垃圾，然后对垃圾进行释放和回收。那么对于GC对于内存回收采取了一定的优先算法进行轮循回收内存资源。</p><p>其次，<strong>对于内存中的垃圾分为两种，一种是需要调用对象的析构函数，另一种是不需要调用的。GC对于前者的回收需要通过两步完成，第一步是调用对象的析构函数，第二步是回收内存，但是要注意这两步不是在GC一次轮循完成，即需要两次轮循；相对于后者，则只是回收内存而已。</strong></p><p>C#中的GC使用了Generation的概念，它将分配的对象分为3代(可用GC.GetGeneration方法返回任意作为参数的对象当前所处的代)。</p><p>最近被分配内存的对象被放置于第0代，因为第0代很小，小到足以放进处理器的二级（L2)缓存，所以它能够提供对对象的快速存取。经过一轮垃圾回收后，仍然保留在第0代中的对象被移进第1代中，再经过一轮垃圾内存回收后，仍然保留在第1代中的对象则被移进第2代中，第2代中包含了生存期较长的对象。 当第0代中没有可以分配的有效内存时，就触发了第0代中的一轮垃圾回收，它将删除那些不再被引用的对象，并将当前正在使用的对象移至第1代。而当第0代垃圾回收后依然不能请求到充足的内存时，就启动第1代垃圾回收。如果对各代都进行了垃圾回收后仍没有可用的内存就会引发一个OutOfMemoryException异常。</p><table><thead><tr><th align="center"></th><th align="center">Close</th><th align="center">Dispose</th><th align="center">析构函数</th></tr></thead><tbody><tr><td align="center"></td><td align="center">关闭对象资源</td><td align="center">销毁对象</td><td align="center">销毁对象</td></tr><tr><td align="center">调用方式</td><td align="center">需要显示调用</td><td align="center">需要显示调用或者通过using语句</td><td align="center">不能被显示调用，会被GC调用</td></tr><tr><td align="center">调用时机</td><td align="center">在显示调用时</td><td align="center">在显示调用或者离开using程序块</td><td align="center">不确定</td></tr></tbody></table>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h3 id=&quot;C-GC机制-Garbage-Collector&quot;&gt;&lt;a href=&quot;#C-GC机制-Garbage-Collector&quot; class=&quot;headerlink&quot; title=&quot;C# GC机制(Garbage Collector)&quot;&gt;&lt;/a&gt;C# GC机制(Garb</summary>
+      
+    
+    
+    
+    <category term="工作" scheme="https://eganblog.com/categories/%E5%B7%A5%E4%BD%9C/"/>
+    
+    
+    <category term="C#" scheme="https://eganblog.com/tags/C/"/>
+    
+    <category term="GC" scheme="https://eganblog.com/tags/GC/"/>
+    
+  </entry>
   
   <entry>
     <title>Go版本切换</title>
