@@ -3,11 +3,11 @@
   <title>Egan&#39;s Blog</title>
   
   <subtitle>一个人的小破站</subtitle>
-  <link href="https://eganblog.com/atom.xml" rel="self"/>
+  <link href="https://blog.eganx.cn/atom.xml" rel="self"/>
   
-  <link href="https://eganblog.com/"/>
+  <link href="https://blog.eganx.cn/"/>
   <updated>2022-02-10T13:36:57.959Z</updated>
-  <id>https://eganblog.com/</id>
+  <id>https://blog.eganx.cn/</id>
   
   <author>
     <name>Egan Dong</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>C# GC机制</title>
-    <link href="https://eganblog.com/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/"/>
-    <id>https://eganblog.com/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/</id>
+    <link href="https://blog.eganx.cn/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/"/>
+    <id>https://blog.eganx.cn/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/</id>
     <published>2022-02-08T13:31:19.000Z</published>
     <updated>2022-02-10T13:36:57.959Z</updated>
     
@@ -33,19 +33,19 @@
     
     
     
-    <category term="工作" scheme="https://eganblog.com/categories/%E5%B7%A5%E4%BD%9C/"/>
+    <category term="工作" scheme="https://blog.eganx.cn/categories/%E5%B7%A5%E4%BD%9C/"/>
     
     
-    <category term="C#" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C#" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="GC" scheme="https://eganblog.com/tags/GC/"/>
+    <category term="GC" scheme="https://blog.eganx.cn/tags/GC/"/>
     
   </entry>
   
   <entry>
     <title>Go版本切换</title>
-    <link href="https://eganblog.com/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/"/>
-    <id>https://eganblog.com/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/</id>
+    <link href="https://blog.eganx.cn/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/"/>
+    <id>https://blog.eganx.cn/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/</id>
     <published>2022-01-05T13:06:11.000Z</published>
     <updated>2022-01-21T09:25:38.625Z</updated>
     
@@ -59,19 +59,19 @@
     
     
     
-    <category term="工作" scheme="https://eganblog.com/categories/%E5%B7%A5%E4%BD%9C/"/>
+    <category term="工作" scheme="https://blog.eganx.cn/categories/%E5%B7%A5%E4%BD%9C/"/>
     
     
-    <category term="go" scheme="https://eganblog.com/tags/go/"/>
+    <category term="go" scheme="https://blog.eganx.cn/tags/go/"/>
     
-    <category term="版本切换" scheme="https://eganblog.com/tags/%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/"/>
+    <category term="版本切换" scheme="https://blog.eganx.cn/tags/%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/"/>
     
   </entry>
   
   <entry>
     <title>C#内存泄露</title>
-    <link href="https://eganblog.com/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/"/>
-    <id>https://eganblog.com/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/</id>
+    <link href="https://blog.eganx.cn/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/"/>
+    <id>https://blog.eganx.cn/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/</id>
     <published>2022-01-03T04:31:19.000Z</published>
     <updated>2022-01-21T09:25:11.138Z</updated>
     
@@ -85,19 +85,19 @@
     
     
     
-    <category term="工作" scheme="https://eganblog.com/categories/%E5%B7%A5%E4%BD%9C/"/>
+    <category term="工作" scheme="https://blog.eganx.cn/categories/%E5%B7%A5%E4%BD%9C/"/>
     
     
-    <category term="C#" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C#" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="OOM" scheme="https://eganblog.com/tags/OOM/"/>
+    <category term="OOM" scheme="https://blog.eganx.cn/tags/OOM/"/>
     
   </entry>
   
   <entry>
     <title>C#串口读写连续性问题</title>
-    <link href="https://eganblog.com/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/"/>
-    <id>https://eganblog.com/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/</id>
+    <link href="https://blog.eganx.cn/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/"/>
+    <id>https://blog.eganx.cn/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/</id>
     <published>2022-01-01T03:31:19.000Z</published>
     <updated>2022-01-21T09:25:09.421Z</updated>
     
@@ -111,19 +111,19 @@
     
     
     
-    <category term="工作" scheme="https://eganblog.com/categories/%E5%B7%A5%E4%BD%9C/"/>
+    <category term="工作" scheme="https://blog.eganx.cn/categories/%E5%B7%A5%E4%BD%9C/"/>
     
     
-    <category term="C#" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C#" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="Serial" scheme="https://eganblog.com/tags/Serial/"/>
+    <category term="Serial" scheme="https://blog.eganx.cn/tags/Serial/"/>
     
   </entry>
   
   <entry>
     <title>华为OD笔试</title>
-    <link href="https://eganblog.com/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/"/>
-    <id>https://eganblog.com/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/</id>
+    <link href="https://blog.eganx.cn/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/"/>
+    <id>https://blog.eganx.cn/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/</id>
     <published>2021-03-09T03:30:12.000Z</published>
     <updated>2022-01-20T11:36:38.632Z</updated>
     
@@ -137,23 +137,23 @@
     
     
     
-    <category term="日常" scheme="https://eganblog.com/categories/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://blog.eganx.cn/categories/%E6%97%A5%E5%B8%B8/"/>
     
-    <category term="工作" scheme="https://eganblog.com/categories/%E6%97%A5%E5%B8%B8/%E5%B7%A5%E4%BD%9C/"/>
+    <category term="工作" scheme="https://blog.eganx.cn/categories/%E6%97%A5%E5%B8%B8/%E5%B7%A5%E4%BD%9C/"/>
     
     
-    <category term="C++" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C++" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="华为OD" scheme="https://eganblog.com/tags/%E5%8D%8E%E4%B8%BAOD/"/>
+    <category term="华为OD" scheme="https://blog.eganx.cn/tags/%E5%8D%8E%E4%B8%BAOD/"/>
     
-    <category term="笔试" scheme="https://eganblog.com/tags/%E7%AC%94%E8%AF%95/"/>
+    <category term="笔试" scheme="https://blog.eganx.cn/tags/%E7%AC%94%E8%AF%95/"/>
     
   </entry>
   
   <entry>
     <title>基础计算器II (Basic calculator II)</title>
-    <link href="https://eganblog.com/2021/03/02/Basic%20calculator%20II/"/>
-    <id>https://eganblog.com/2021/03/02/Basic%20calculator%20II/</id>
+    <link href="https://blog.eganx.cn/2021/03/02/Basic%20calculator%20II/"/>
+    <id>https://blog.eganx.cn/2021/03/02/Basic%20calculator%20II/</id>
     <published>2021-03-02T02:22:11.000Z</published>
     <updated>2022-01-20T11:36:46.499Z</updated>
     
@@ -167,25 +167,25 @@
     
     
     
-    <category term="算法" scheme="https://eganblog.com/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="算法" scheme="https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/"/>
     
-    <category term="Leetcode" scheme="https://eganblog.com/categories/%E7%AE%97%E6%B3%95/Leetcode/"/>
+    <category term="Leetcode" scheme="https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/Leetcode/"/>
     
     
-    <category term="日常" scheme="https://eganblog.com/tags/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://blog.eganx.cn/tags/%E6%97%A5%E5%B8%B8/"/>
     
-    <category term="C++" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C++" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="Leetcode" scheme="https://eganblog.com/tags/Leetcode/"/>
+    <category term="Leetcode" scheme="https://blog.eganx.cn/tags/Leetcode/"/>
     
-    <category term="栈" scheme="https://eganblog.com/tags/%E6%A0%88/"/>
+    <category term="栈" scheme="https://blog.eganx.cn/tags/%E6%A0%88/"/>
     
   </entry>
   
   <entry>
     <title>逆波兰表示法(Reverse Polish notation)</title>
-    <link href="https://eganblog.com/2021/03/01/Reverse%20Polish%20notation/"/>
-    <id>https://eganblog.com/2021/03/01/Reverse%20Polish%20notation/</id>
+    <link href="https://blog.eganx.cn/2021/03/01/Reverse%20Polish%20notation/"/>
+    <id>https://blog.eganx.cn/2021/03/01/Reverse%20Polish%20notation/</id>
     <published>2021-03-01T08:12:14.000Z</published>
     <updated>2022-01-20T11:36:29.903Z</updated>
     
@@ -199,25 +199,25 @@
     
     
     
-    <category term="算法" scheme="https://eganblog.com/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="算法" scheme="https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/"/>
     
-    <category term="Leetcode" scheme="https://eganblog.com/categories/%E7%AE%97%E6%B3%95/Leetcode/"/>
+    <category term="Leetcode" scheme="https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/Leetcode/"/>
     
     
-    <category term="日常" scheme="https://eganblog.com/tags/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://blog.eganx.cn/tags/%E6%97%A5%E5%B8%B8/"/>
     
-    <category term="C++" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C++" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="Leetcode" scheme="https://eganblog.com/tags/Leetcode/"/>
+    <category term="Leetcode" scheme="https://blog.eganx.cn/tags/Leetcode/"/>
     
-    <category term="栈" scheme="https://eganblog.com/tags/%E6%A0%88/"/>
+    <category term="栈" scheme="https://blog.eganx.cn/tags/%E6%A0%88/"/>
     
   </entry>
   
   <entry>
     <title>Ming&#39;s random numbers</title>
-    <link href="https://eganblog.com/2021/02/22/Ming&#39;s%20random%20numbers/"/>
-    <id>https://eganblog.com/2021/02/22/Ming&#39;s%20random%20numbers/</id>
+    <link href="https://blog.eganx.cn/2021/02/22/Ming&#39;s%20random%20numbers/"/>
+    <id>https://blog.eganx.cn/2021/02/22/Ming&#39;s%20random%20numbers/</id>
     <published>2021-02-22T05:46:57.000Z</published>
     <updated>2022-01-20T11:36:25.742Z</updated>
     
@@ -231,27 +231,27 @@
     
     
     
-    <category term="算法" scheme="https://eganblog.com/categories/%E7%AE%97%E6%B3%95/"/>
+    <category term="算法" scheme="https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/"/>
     
-    <category term="Leetcode" scheme="https://eganblog.com/categories/%E7%AE%97%E6%B3%95/Leetcode/"/>
+    <category term="Leetcode" scheme="https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/Leetcode/"/>
     
     
-    <category term="日常" scheme="https://eganblog.com/tags/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://blog.eganx.cn/tags/%E6%97%A5%E5%B8%B8/"/>
     
-    <category term="C++" scheme="https://eganblog.com/tags/C/"/>
+    <category term="C++" scheme="https://blog.eganx.cn/tags/C/"/>
     
-    <category term="Leetcode" scheme="https://eganblog.com/tags/Leetcode/"/>
+    <category term="Leetcode" scheme="https://blog.eganx.cn/tags/Leetcode/"/>
     
-    <category term="sort" scheme="https://eganblog.com/tags/sort/"/>
+    <category term="sort" scheme="https://blog.eganx.cn/tags/sort/"/>
     
-    <category term="unique" scheme="https://eganblog.com/tags/unique/"/>
+    <category term="unique" scheme="https://blog.eganx.cn/tags/unique/"/>
     
   </entry>
   
   <entry>
     <title>毕业半年的自己</title>
-    <link href="https://eganblog.com/2020/12/22/Six_months_after_graduation/"/>
-    <id>https://eganblog.com/2020/12/22/Six_months_after_graduation/</id>
+    <link href="https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/"/>
+    <id>https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/</id>
     <published>2020-12-22T05:46:57.000Z</published>
     <updated>2022-01-20T11:36:33.880Z</updated>
     
@@ -265,21 +265,21 @@
     
     
     
-    <category term="日常" scheme="https://eganblog.com/categories/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://blog.eganx.cn/categories/%E6%97%A5%E5%B8%B8/"/>
     
-    <category term="工作" scheme="https://eganblog.com/categories/%E6%97%A5%E5%B8%B8/%E5%B7%A5%E4%BD%9C/"/>
+    <category term="工作" scheme="https://blog.eganx.cn/categories/%E6%97%A5%E5%B8%B8/%E5%B7%A5%E4%BD%9C/"/>
     
     
-    <category term="日常" scheme="https://eganblog.com/tags/%E6%97%A5%E5%B8%B8/"/>
+    <category term="日常" scheme="https://blog.eganx.cn/tags/%E6%97%A5%E5%B8%B8/"/>
     
-    <category term="杂记" scheme="https://eganblog.com/tags/%E6%9D%82%E8%AE%B0/"/>
+    <category term="杂记" scheme="https://blog.eganx.cn/tags/%E6%9D%82%E8%AE%B0/"/>
     
   </entry>
   
   <entry>
     <title>Test</title>
-    <link href="https://eganblog.com/2020/10/22/firstPage/"/>
-    <id>https://eganblog.com/2020/10/22/firstPage/</id>
+    <link href="https://blog.eganx.cn/2020/10/22/firstPage/"/>
+    <id>https://blog.eganx.cn/2020/10/22/firstPage/</id>
     <published>2020-10-22T03:10:47.000Z</published>
     <updated>2022-01-20T11:36:20.632Z</updated>
     
@@ -297,7 +297,7 @@
     
     
     
-    <category term="Test" scheme="https://eganblog.com/tags/Test/"/>
+    <category term="Test" scheme="https://blog.eganx.cn/tags/Test/"/>
     
   </entry>
   
