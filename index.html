@@ -9,6 +9,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
 
 <link rel="stylesheet" href="/css/main.css">
 
@@ -152,7 +154,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/02/08/CSharp_GC_mechanism/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -166,7 +168,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">C# GC机制(Garbage Collector)</a>
+            <a href="/2022/02/08/CSharp_GC_mechanism/" class="post-title-link" itemprop="url">C# GC机制(Garbage Collector)</a>
         </h2>
 
         <div class="post-meta">
@@ -199,12 +201,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>记录一下C#中GC的相关知识。不记下来，下次又找不到，就很烦。</p>
-<h4 id="1、资源概念"><a href="#1、资源概念" class="headerlink" title="1、资源概念"></a>1、资源概念</h4><p>所谓的资源其实就是程序中可以利用的数据。比如字符串、图片和任何的二进制数据。</p>
-<p>托管资源，非托管资源：托管资源是由CLR全权负责的资源，CLR不负责的资源位非托管资源。<br><strong>对于托管资源通过GC自动清理回收。对于非托管的资源，一般就是Stream，数据库的连接，网络连接，GDI+的相关对象，还有Com对象等等这些操作系统资源，需要我们手动去释放，再由GC回收。</strong>  </p>
+          <p>记录一下C#中GC的相关知识。不记下来，下次又找不到，就很烦。</p>
+<p>主要针对的是C#中如何判定Garbage和GC的运作方式。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/#more" rel="contents">
+              <a class="btn" href="/2022/02/08/CSharp_GC_mechanism/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -228,7 +229,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/01/05/Go_Version_switching/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -242,7 +243,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/" class="post-title-link" itemprop="url">Go版本切换</a>
+            <a href="/2022/01/05/Go_Version_switching/" class="post-title-link" itemprop="url">Go版本切换</a>
         </h2>
 
         <div class="post-meta">
@@ -275,15 +276,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="手动管理-目前使用的切换方式"><a href="#手动管理-目前使用的切换方式" class="headerlink" title="手动管理(目前使用的切换方式)"></a>手动管理(目前使用的切换方式)</h3><p>官网下载最新版Archive文件go1.18beta1.darwin-amd64.tar.gz</p>
-<p>解压缩重命名go1.18.beta1,拷贝一份放到默认安装路径<code>/usr/local/go1.18beta1</code></p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo cp -R /User/egan/Sdks/go1.18beta1 /usr/local/go1.18beta1</span><br></pre></td></tr></table></figure>
-
-<p>进入默认安装路径，创建软链</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd /usr/local/</span><br><span class="line">sudo ln -s go1.18beta1 go</span><br></pre></td></tr></table></figure>
+          <p>线上的程序用的是老版本的Go(毕竟比较稳)，自己又想尝试新的版本特性。久而久之，电脑里面SDK的版本就越来越多了，每次切换起来就很麻烦。所以特此记录一下。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/#more" rel="contents">
+              <a class="btn" href="/2022/01/05/Go_Version_switching/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -307,7 +303,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/01/03/CSharp_OOM/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -321,7 +317,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/" class="post-title-link" itemprop="url">C#内存泄露</a>
+            <a href="/2022/01/03/CSharp_OOM/" class="post-title-link" itemprop="url">C#内存泄露</a>
         </h2>
 
         <div class="post-meta">
@@ -354,14 +350,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="问题产生原因"><a href="#问题产生原因" class="headerlink" title="问题产生原因"></a>问题产生原因</h3><p>在<code>button1.Click += Button1_Click</code>中，(+=) 来为事件附加事件处理程序</p>
-<p>给button1_Click的附加事件处理程序放在了心跳里面；</p>
-<p>此次溢出是因为每次心跳，又进行了一次事件处理程序的附加，造成不断附件事件处理程序。</p>
-<p>直至最后，点击一次，要运行2K+次的事件处理程序。</p>
-<p>而事件处理程序的代码里面会使用创建新的线程，运行一次，创建大量的新线程，线程数直接飙升，内存崩掉。</p>
+          <p>记录自己干的蠢事，这也是自己第一次在工作中写出来内存泄漏。幸亏程序没有直接上线，以后还是要多测试测试自己的代码。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/#more" rel="contents">
+              <a class="btn" href="/2022/01/03/CSharp_OOM/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -385,7 +377,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/01/01/CSharp_Serial_port_readwrite_continuity_problem/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -399,7 +391,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">C#串口读写连续性问题</a>
+            <a href="/2022/01/01/CSharp_Serial_port_readwrite_continuity_problem/" class="post-title-link" itemprop="url">C#串口读写连续性问题</a>
         </h2>
 
         <div class="post-meta">
@@ -432,10 +424,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在使用串口协议进行自定义协议读写的时候，一般使用Ascii编码。但是串口中读取到的数据并不能保证其完整性。一条指令有可能会被拆分成多条数据发送，读取到的字符串有可能只是其中的一部分。一般一条指令的末尾都会加上\n\r作为结束符。</p>
+          <p>在使用串口协议进行自定义协议读写的时候，一般使用Ascii编码。但是串口中读取到的数据并不能保证其完整性。一条指令有可能会被拆分成多条数据发送，读取到的字符串有可能只是其中的一部分。一般一条指令的末尾都会加上\n\r作为结束符。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/#more" rel="contents">
+              <a class="btn" href="/2022/01/01/CSharp_Serial_port_readwrite_continuity_problem/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -459,7 +451,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2021/03/09/Huawei_OD_exam/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -473,7 +465,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/" class="post-title-link" itemprop="url">华为OD笔试</a>
+            <a href="/2021/03/09/Huawei_OD_exam/" class="post-title-link" itemprop="url">华为OD笔试</a>
         </h2>
 
         <div class="post-meta">
@@ -510,12 +502,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="第一题"><a href="#第一题" class="headerlink" title="第一题"></a>第一题</h3><p>用一个数组A，代表程序员的工作能力。公司想通过结对编程的模式来提高员工的工作能力，假设成对后的能力是两个员工的能力之和，求一共有多少种结对方式，使结对后的能力为N。</p>
-<p><strong>提示：</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 第一行代表员工个数</span><br><span class="line">2. 第二行代表各个员工的能力值</span><br><span class="line">3. 第三行代表结对后的能力值N</span><br><span class="line">4. 输出为结对的组合方式的值</span><br></pre></td></tr></table></figure>
+          <p>第一次参加华为OD的笔试，作为参加过<del>精英</del>笔试的优秀青年。我还是想记录一下的。说实话题目还行，但是裸考还是有点难度的(个人观点，或许是我菜的过分了)。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/#more" rel="contents">
+              <a class="btn" href="/2021/03/09/Huawei_OD_exam/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -539,7 +529,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2021/03/02/Basic%20calculator%20II/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2021/03/02/Basic_calculator_II/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -553,7 +543,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/03/02/Basic%20calculator%20II/" class="post-title-link" itemprop="url">基础计算器II (Basic calculator II)</a>
+            <a href="/2021/03/02/Basic_calculator_II/" class="post-title-link" itemprop="url">基础计算器II (Basic calculator II)</a>
         </h2>
 
         <div class="post-meta">
@@ -590,12 +580,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>给一个字符串表达式 <code>s</code> ，实现一个基本计算器来计算并返回它的值。(整数除法仅保留整数部分)</p>
-<p><strong>提示：</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 1 &lt;&#x3D; s.length &lt;&#x3D; 3 * 10^5</span><br><span class="line">2. s 由整数和算符(&#39;+&#39;, &#39;-&#39;, &#39;*&#39;, &#39;&#x2F;&#39;)组成,中间由一些空格隔开</span><br><span class="line">3. s 表示一个有效表达式</span><br><span class="line">4. 表达式中的所有整数都是非负整数,且在范围[0, 231 - 1]内</span><br><span class="line">5. 题目数据保证答案是一个32-bit整数</span><br></pre></td></tr></table></figure>
+          <p>栈的经典应用：</p>
+<p>给一个字符串表达式 <code>s</code> ，实现一个基本计算器来计算并返回它的值。(整数除法仅保留整数部分)</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/03/02/Basic%20calculator%20II/#more" rel="contents">
+              <a class="btn" href="/2021/03/02/Basic_calculator_II/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -670,12 +659,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h3><p>根据逆波兰表示法，求表达式的值。</p>
-<p>有效的运算符包括 <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> 。每个运算对象可以是整数，也可以是另一个逆波兰表达式。逆波兰表达式是一种后缀表达式，所谓后缀就是指算符写在后面。</p>
-<p>逆波兰表达式主要有以下两个优点：</p>
-<ul>
-<li>去掉括号后表达式无歧义，<code>( 1 + 2 ) * ( 3 + 4 )</code>即便写成 <code>1 2 + 3 4 + * </code>也可以依据次序计算出正确结果。</li>
-<li>适合用栈操作运算
+          <p>根据逆波兰表示法，求表达式的值。</p>
+<p>有效的运算符包括 <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> 。每个运算对象可以是整数，也可以是另一个逆波兰表达式。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/03/01/Reverse%20Polish%20notation/#more" rel="contents">
@@ -702,7 +687,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2021/02/22/Ming's%20random%20numbers/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2021/02/22/Ming's_random_numbers/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -716,7 +701,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/02/22/Ming's%20random%20numbers/" class="post-title-link" itemprop="url">明明的随机数(Ming's random numbers)</a>
+            <a href="/2021/02/22/Ming's_random_numbers/" class="post-title-link" itemprop="url">明明的随机数(Ming's random numbers)</a>
         </h2>
 
         <div class="post-meta">
@@ -756,7 +741,7 @@
           <p>明明想在学校中请一些同学一起做一项问卷调查，为了实验的客观性，他先用计算机生成了N个1到1000之间的随机整数（N≤1000），对于其中重复的数字，只保留一个，把其余相同的数去掉，不同的数对应着不同的学生的学号。然后再把这些数从小到大排序，按照排好的顺序去找同学做调查。请你协助明明完成“去重”与“排序”的工作(同一个测试用例里可能会有多组数据(用于不同的调查)，希望大家能正确处理)</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/02/22/Ming's%20random%20numbers/#more" rel="contents">
+              <a class="btn" href="/2021/02/22/Ming's_random_numbers/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -831,7 +816,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="半年之后"><a href="#半年之后" class="headerlink" title="半年之后"></a>半年之后</h2><p>&emsp;我们这届的毕业生，大学只上了三年半，最后半年的时光都是在家里渡过。拿毕业证学位证、拍毕业照以及收拾行李，加起来不过两天时间。一切都是匆匆忙忙，匆忙到连一顿散伙饭都没法进行。<br><br>&emsp;还差几日，自己也就毕业半年了，也算是有了半年的<del>工作经验</del>(划水经验)，学软件的我，毕业之后进了一家偏自动化的公司，工业4.0时代嘛，天天代码倒是不多，感觉还不错。</p>
+          <h2 id="0x0-半年之后"><a href="#0x0-半年之后" class="headerlink" title="0x0.半年之后"></a>0x0.半年之后</h2><p>&emsp;我们这届的毕业生，大学只上了三年半，最后半年的时光都是在家里渡过。拿毕业证学位证、拍毕业照以及收拾行李，加起来不过两天时间。一切都是匆匆忙忙，匆忙到连一顿散伙饭都没法进行。<br><br>&emsp;还差几日，自己也就毕业半年了，也算是有了半年的<del>工作经验</del>(划水经验)，学软件的我，毕业之后进了一家偏自动化的公司，工业4.0时代嘛，天天代码倒是不多，感觉还不错。</p>
 
       
     </div>
@@ -851,7 +836,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2020/10/22/firstPage%E7%9A%84%E5%89%AF%E6%9C%AC/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2020/10/22/firstPage/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -865,7 +850,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2020/10/22/firstPage%E7%9A%84%E5%89%AF%E6%9C%AC/" class="post-title-link" itemprop="url">Test</a>
+            <a href="/2020/10/22/firstPage/" class="post-title-link" itemprop="url">Test</a>
         </h2>
 
         <div class="post-meta">
@@ -909,9 +894,6 @@
 
 
   
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
 
 
 

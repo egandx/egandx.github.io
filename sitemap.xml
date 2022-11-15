@@ -4,56 +4,63 @@
   <url>
     <loc>https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/</loc>
     
-    <lastmod>2022-11-14</lastmod>
+    <lastmod>2022-11-15</lastmod>
     
   </url>
   
   <url>
     <loc>https://blog.eganx.cn/2021/03/01/Reverse%20Polish%20notation/</loc>
     
-    <lastmod>2022-11-14</lastmod>
+    <lastmod>2022-11-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/2021/02/22/Ming's%20random%20numbers/</loc>
+    <loc>https://blog.eganx.cn/2021/02/22/Ming's_random_numbers/</loc>
     
-    <lastmod>2022-11-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/2022/01/05/Go%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/</loc>
-    
-    <lastmod>2022-11-14</lastmod>
+    <lastmod>2022-11-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/2022/01/03/CSharp%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA/</loc>
+    <loc>https://blog.eganx.cn/2021/03/09/Huawei_OD_exam/</loc>
     
-    <lastmod>2022-11-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/2022/01/01/CSharp%E4%B8%B2%E5%8F%A3%E8%AF%BB%E5%86%99%E8%BF%9E%E7%BB%AD%E6%80%A7%E9%97%AE%E9%A2%98/</loc>
-    
-    <lastmod>2022-11-14</lastmod>
+    <lastmod>2022-11-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/2021/03/02/Basic%20calculator%20II/</loc>
+    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
     
-    <lastmod>2022-11-14</lastmod>
+    <lastmod>2022-11-15</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/2021/03/09/%E5%8D%8E%E4%B8%BAOD%E7%AC%94%E8%AF%95/</loc>
+    <loc>https://blog.eganx.cn/2022/01/01/CSharp_Serial_port_readwrite_continuity_problem/</loc>
     
-    <lastmod>2022-11-14</lastmod>
+    <lastmod>2022-11-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/2022/01/03/CSharp_OOM/</loc>
+    
+    <lastmod>2022-11-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/2022/02/08/CSharp_GC_mechanism/</loc>
+    
+    <lastmod>2022-11-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/2021/03/02/Basic_calculator_II/</loc>
+    
+    <lastmod>2022-11-15</lastmod>
     
   </url>
   
@@ -61,20 +68,6 @@
     <loc>https://blog.eganx.cn/about/index.html</loc>
     
     <lastmod>2022-11-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/2022/02/08/CSharp%20GC%E6%9C%BA%E5%88%B6/</loc>
-    
-    <lastmod>2022-11-14</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/2020/10/22/firstPage%E7%9A%84%E5%89%AF%E6%9C%AC/</loc>
-    
-    <lastmod>2022-01-20</lastmod>
     
   </url>
   
@@ -130,13 +123,6 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/tags/Serial/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/tags/%E6%97%A5%E5%B8%B8/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
@@ -172,6 +158,13 @@
   </url>
   
   <url>
+    <loc>https://blog.eganx.cn/tags/Serial/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.eganx.cn/tags/go/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
@@ -180,6 +173,20 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/%E5%8D%8E%E4%B8%BAOD/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/%E7%AC%94%E8%AF%95/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -208,20 +215,6 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/Test/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/%E5%8D%8E%E4%B8%BAOD/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/%E7%AC%94%E8%AF%95/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
