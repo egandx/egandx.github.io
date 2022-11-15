@@ -158,13 +158,6 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/tags/OOM/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/tags/Serial/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
@@ -194,6 +187,13 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/%E7%AC%94%E8%AF%95/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/OOM/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -244,14 +244,14 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/Leetcode/</loc>
+    <loc>https://blog.eganx.cn/categories/Golang/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/categories/Golang/</loc>
+    <loc>https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/Leetcode/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
