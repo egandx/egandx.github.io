@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>Go Slice的扩容策略</title>
+      <link href="2022/11/15/Go_Slice_growup/"/>
+      <url>2022/11/15/Go_Slice_growup/</url>
+      
+        <content type="html"><![CDATA[<p>在写Go的时候，对Slice的操作就很危险，特别是函数参数传的是Slice指针，一不小心就改了。切片支持子切片  和原本切片共享底层数组，那子切片和切片究竟会不会相互影响？ 就看他们是不是还共享底层数组。如果他们的结构没有变化，肯定是共享的。结构发生变化(扩容)，就可能不共享了。</p><p>对子切片的使用建议：只读不改</p><span id="more"></span><h2 id="0x0-Slice和Array的联系"><a href="#0x0-Slice和Array的联系" class="headerlink" title="0x0.Slice和Array的联系"></a>0x0.Slice和Array的联系</h2><p>slice 的底层数据是数组，slice 是对数组的封装。两者都可以通过下标来访问单个元素。</p><p>数组就是一片连续的内存，是定长的，其长度是类型的一部分，比如 [3]int 和 [4]int 就是不同的类型。</p><p>slice可以动态地扩容，切片的类型和长度无关。</p><p>slice 是一个结构体，包含三个字段：长度、容量、底层数组。</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">type slice struct &#123;</span><br><span class="line">array unsafe.Pointer &#x2F;&#x2F; 元素指针</span><br><span class="line">len   int &#x2F;&#x2F; 长度 </span><br><span class="line">cap   int &#x2F;&#x2F; 容量</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>不是每一个Slice都有自己专属的底层数组，底层数组是可以被多个Slice同时指向的，也就是说在修改SliceA的数据时，有可能SliceB的数据也会发生改变。</p><h2 id="0x1-Slice扩容策略"><a href="#0x1-Slice扩容策略" class="headerlink" title="0x1.Slice扩容策略"></a>0x1.Slice扩容策略</h2><p>在golang1.18版本之前，Slice的扩容策略是当原 slice 容量小于 <code>1024</code> 的时候，新 slice 容量变成原来的 <code>2</code> 倍；原 slice 容量超过 <code>1024</code>，新 slice 容量变成原来的<code>1.25</code>倍。</p><p>在golang1.18版本之后，新的Slice扩容策略是当原slice容量(oldcap)小于<code>256</code>的时候，新slice(newcap)容量为原来的<code>2</code>倍；原slice容量超过<code>256</code>，新slice容量<code>newcap = oldcap+(oldcap+3*256)/4</code></p><blockquote><p>在实际的扩容过程中，还需要考虑内存对齐产生的影响，这个和内存分配策略相关。进行内存对齐之后，新 slice 的容量是要 <code>大于等于</code> 理论的扩容量。</p></blockquote><p>经典例题，来自<a href="https://jodezer.github.io/2017/05/golangSlice%E7%9A%84%E6%89%A9%E5%AE%B9%E8%A7%84%E5%88%99">golang Slice的扩容规则</a></p><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">s := []<span class="keyword">int</span>&#123;<span class="number">1</span>,<span class="number">2</span>&#125;</span><br><span class="line">s = <span class="built_in">append</span>(s,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>)</span><br><span class="line">fmt.Printf(<span class="string">&quot;len=%d, cap=%d&quot;</span>,<span class="built_in">len</span>(s),<span class="built_in">cap</span>(s))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><blockquote><p>运行结果：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">len&#x3D;5, cap&#x3D;6</span><br></pre></td></tr></table></figure></blockquote>]]></content>
+      
+      
+      <categories>
+          
+          <category> Golang </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> go </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C# GC机制(Garbage Collector)</title>
       <link href="2022/02/08/CSharp_GC_mechanism/"/>
       <url>2022/02/08/CSharp_GC_mechanism/</url>
@@ -40,7 +65,7 @@
       
       <categories>
           
-          <category> 工作 </category>
+          <category> Golang </category>
           
       </categories>
       

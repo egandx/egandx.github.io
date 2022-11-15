@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.eganx.cn/2022/11/15/Go_Slice_growup/</loc>
+    <lastmod>2022-11-15</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
+    <lastmod>2022-11-15</lastmod>
+  </url>
+  <url>
     <loc>https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/</loc>
     <lastmod>2022-11-15</lastmod>
   </url>
@@ -14,10 +22,6 @@
   </url>
   <url>
     <loc>https://blog.eganx.cn/2021/03/09/Huawei_OD_exam/</loc>
-    <lastmod>2022-11-15</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
     <lastmod>2022-11-15</lastmod>
   </url>
   <url>

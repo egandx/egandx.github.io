@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://blog.eganx.cn/2022/11/15/Go_Slice_growup/</loc>
+    
+    <lastmod>2022-11-15</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
+    
+    <lastmod>2022-11-15</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/</loc>
     
     <lastmod>2022-11-15</lastmod>
@@ -24,13 +38,6 @@
   
   <url>
     <loc>https://blog.eganx.cn/2021/03/09/Huawei_OD_exam/</loc>
-    
-    <lastmod>2022-11-15</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
     
     <lastmod>2022-11-15</lastmod>
     
@@ -109,20 +116,6 @@
 
   
   <url>
-    <loc>https://blog.eganx.cn/tags/C/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/GC/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/tags/%E6%97%A5%E5%B8%B8/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
@@ -145,6 +138,20 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/%E6%A0%88/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/C/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/GC/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -223,13 +230,6 @@
 
   
   <url>
-    <loc>https://blog.eganx.cn/categories/%E5%B7%A5%E4%BD%9C/</loc>
-    <lastmod>2022-11-15</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
@@ -237,7 +237,7 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/categories/%E6%97%A5%E5%B8%B8/</loc>
+    <loc>https://blog.eganx.cn/categories/%E5%B7%A5%E4%BD%9C/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -245,6 +245,20 @@
   
   <url>
     <loc>https://blog.eganx.cn/categories/%E7%AE%97%E6%B3%95/Leetcode/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/categories/Golang/</loc>
+    <lastmod>2022-11-15</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/categories/%E6%97%A5%E5%B8%B8/</loc>
     <lastmod>2022-11-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
