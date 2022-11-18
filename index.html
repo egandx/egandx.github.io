@@ -182,7 +182,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/15/Go_Slice_growup/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/10/22/Go_Map/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -196,7 +196,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/11/15/Go_Slice_growup/" class="post-title-link" itemprop="url">Go Slice的扩容策略</a>
+            <a href="/2022/10/22/Go_Map/" class="post-title-link" itemprop="url">Go Map的基本结构和key的定位过程</a>
         </h2>
 
         <div class="post-meta">
@@ -206,7 +206,81 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-11-15 12:56:11" itemprop="dateCreated datePublished" datetime="2022-11-15T12:56:11+08:00">2022-11-15</time>
+              <time title="创建时间：2022-10-22 14:53:19" itemprop="dateCreated datePublished" datetime="2022-10-22T14:53:19+08:00">2022-10-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>map由key-value对组成，并且一个key只会出现一次。对map可以进行增删改查一系列操作。在Go语言，map采用的是哈希查找表实现，解决哈希冲突的方式是链表法。记录一下学习过程中了解到的map基本结构和key的定位过程。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/10/22/Go_Map/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/10/15/Go_Slice_growup/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/10/15/Go_Slice_growup/" class="post-title-link" itemprop="url">Go Slice的扩容策略</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-15 12:56:11" itemprop="dateCreated datePublished" datetime="2022-10-15T12:56:11+08:00">2022-10-15</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -233,7 +307,7 @@
 <p>对子切片的使用建议：只读不改</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/11/15/Go_Slice_growup/#more" rel="contents">
+              <a class="btn" href="/2022/10/15/Go_Slice_growup/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -850,77 +924,6 @@
             </div>
           <!--/noindex-->
         
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Egan Dong">
-      <meta itemprop="description" content="You are more than what you have become">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Egan's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2020/12/22/Six_months_after_graduation/" class="post-title-link" itemprop="url">毕业半年的自己</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-12-22 13:46:57" itemprop="dateCreated datePublished" datetime="2020-12-22T13:46:57+08:00">2020-12-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A5%E5%B8%B8/" itemprop="url" rel="index"><span itemprop="name">日常</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A5%E5%B8%B8/%E5%B7%A5%E4%BD%9C/" itemprop="url" rel="index"><span itemprop="name">工作</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="0x0-半年之后"><a href="#0x0-半年之后" class="headerlink" title="0x0.半年之后"></a>0x0.半年之后</h2><p>&emsp;我们这届的毕业生，大学只上了三年半，最后半年的时光都是在家里渡过。拿毕业证学位证、拍毕业照以及收拾行李，加起来不过两天时间。一切都是匆匆忙忙，匆忙到连一顿散伙饭都没法进行。<br><br>&emsp;还差几日，自己也就毕业半年了，也算是有了半年的<del>工作经验</del>(划水经验)，学软件的我，毕业之后进了一家偏自动化的公司，工业4.0时代嘛，天天代码倒是不多，感觉还不错。</p>
-
       
     </div>
 

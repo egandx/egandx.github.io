@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=SimHei:300,300italic,400,400italic,700,700italic|0.7:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="map由key-value对组成，并且一个key只会出现一次。对map可以进行增删改查一系列操作。在Go语言，map采用的是哈希查找表实现，解决哈希冲突的方式是链表法。记录一下学习过程中了解到的map基本结构和key的定位过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Map的基本结构和key的定位过程">
+<meta property="og:url" content="https://blog.eganx.cn/2022/10/22/Go_Map/index.html">
+<meta property="og:site_name" content="Egan&#39;s Blog">
+<meta property="og:description" content="map由key-value对组成，并且一个key只会出现一次。对map可以进行增删改查一系列操作。在Go语言，map采用的是哈希查找表实现，解决哈希冲突的方式是链表法。记录一下学习过程中了解到的map基本结构和key的定位过程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-22T06:53:19.000Z">
+<meta property="article:modified_time" content="2022-11-18T05:59:30.852Z">
+<meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.eganx.cn/2022/10/22/Go_Map/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Go Map的基本结构和key的定位过程 | Egan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Egan's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <h1 class="site-title">Egan's Blog</h1>
+    </a>
+      <p class="site-subtitle" itemprop="description">一个人的小破站</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/10/22/Go_Map/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go Map的基本结构和key的定位过程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-22 14:53:19" itemprop="dateCreated datePublished" datetime="2022-10-22T14:53:19+08:00">2022-10-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>map由key-value对组成，并且一个key只会出现一次。对map可以进行增删改查一系列操作。在Go语言，map采用的是哈希查找表实现，解决哈希冲突的方式是链表法。记录一下学习过程中了解到的map基本结构和key的定位过程。</p>
+<span id="more"></span>
+
+<h2 id="0x0-map的基本结构"><a href="#0x0-map的基本结构" class="headerlink" title="0x0.map的基本结构"></a>0x0.map的基本结构</h2><p>附上源码(go1.18.2/src/runtime/map.go)</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// A header for a Go map.</span></span><br><span class="line"><span class="keyword">type</span> hmap <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// Note: the format of the hmap is also encoded in</span></span><br><span class="line">  <span class="comment">// cmd/compile/internal/reflectdata/reflect.go.</span></span><br><span class="line">	<span class="comment">// Make sure this stays in sync with the compiler&#x27;s definition.</span></span><br><span class="line">	count     <span class="keyword">int</span> <span class="comment">// # live cells == size of map.  Must be first (used by len() builtin)</span></span><br><span class="line">	flags     <span class="keyword">uint8</span></span><br><span class="line">	B         <span class="keyword">uint8</span>  <span class="comment">// log_2 of # of buckets (can hold up to loadFactor * 2^B items)</span></span><br><span class="line">	noverflow <span class="keyword">uint16</span> <span class="comment">// approximate number of overflow buckets; see incrnoverflow for details</span></span><br><span class="line">	hash0     <span class="keyword">uint32</span> <span class="comment">// hash seed</span></span><br><span class="line"></span><br><span class="line">	buckets    unsafe.Pointer <span class="comment">// array of 2^B Buckets. may be nil if count==0.</span></span><br><span class="line">	oldbuckets unsafe.Pointer <span class="comment">// previous bucket array of half the size, non-nil only when growing</span></span><br><span class="line">	nevacuate  <span class="keyword">uintptr</span>        <span class="comment">// progress counter for evacuation (buckets less than this have been evacuated)</span></span><br><span class="line"></span><br><span class="line">	extra *mapextra <span class="comment">// optional fields</span></span><br><span class="line">&#125;                                                               </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">┌──────┐</span><br><span class="line">│ hmap │</span><br><span class="line">├──────┴─────────────────────┐ ┌─────┐</span><br><span class="line">│          count int         │ │     │</span><br><span class="line">├────────────────────────────┤ │     ▼</span><br><span class="line">│          flags uint8       │ │  ┌──────┐      ┌───────┐</span><br><span class="line">├────────────────────────────┤ │  │[]bmap│    ┌►│ bmap  │</span><br><span class="line">│           B uint8          │ │  ├──────┴─┐  │ ├───────┴───────────────────────┐</span><br><span class="line">├────────────────────────────┤ │  │   0    ├──┘ │   tophash [bucketCnt]uint8    │</span><br><span class="line">│       noverflow uint16     │ │  ├────────┤    ├───────┬───────────────────────┤</span><br><span class="line">├────────────────────────────┤ │  │   1    │    │ key   │                       │</span><br><span class="line">│        hash0 uint32        │ │  ├────────┤    ├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">├────────────────────────────┤ │  │   2    │    │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">│   buckets unsafe.Pointer   ├─┘  ├────────┤    ├───┴───┼───┴───┴───┴───┴───┴───┤</span><br><span class="line">├────────────────────────────┤    │   3    │    │ values│                       │</span><br><span class="line">│  oldbuckets unsafe.Pointer │    ├────────┤    ├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">├────────────────────────────┤    │  ...   │    │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">│     nevacuates uintptr     │    ├────────┤    ├───┴───┴───┴───┴───┴───┴───┴───┤</span><br><span class="line">├────────────────────────────┤    │   62   │    │        overflow *bmap         │</span><br><span class="line">│       extra *mapextra      │    ├────────┤    └─────┬─────────────────────────┘</span><br><span class="line">└────┬───────────────────────┘    │   63   ├─┐        │</span><br><span class="line">     │                            └────────┘ │        │      ┌───────┐</span><br><span class="line">     ▼                             size&#x3D;2^B  │        └─────►│ bmap  │</span><br><span class="line">┌──────────┐                                 │               ├───────┴───────────────────────┐</span><br><span class="line">│ mapextra │                                 │               │   tophash [bucketCnt]uint8    │</span><br><span class="line">├──────────┴─────────┐                       │               ├───────┬───────────────────────┤</span><br><span class="line">│ overflow *[]*bmap  │   ┌───────┐ ◄─────────┘               │ key   │                       │</span><br><span class="line">├────────────────────┤   │ bmap  │                           ├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">│oldoverflow *[]*bmap│   ├───────┴───────────────────────┐   │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">├────────────────────┤   │   tophash [bucketCnt]uint8    │   ├───┴───┼───┴───┴───┴───┴───┴───┤</span><br><span class="line">│ nextoverflow *bmap │   ├───────┬───────────────────────┤   │ values│                       │</span><br><span class="line">└────────────────────┘   │ key   │                       │   ├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">                         ├───┬───┼───┬───┬───┬───┬───┬───┤   │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">                         │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │   ├───┴───┴───┴───┴───┴───┴───┴───┤</span><br><span class="line">                         ├───┴───┼───┴───┴───┴───┴───┴───┤   │        overflow *bmap         │</span><br><span class="line">                         │ values│                       │   └───────────────────────────────┘</span><br><span class="line">                         ├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">                         │ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">                         ├───┴───┴───┴───┴───┴───┴───┴───┤       ┌────────┐</span><br><span class="line">                         │        overflow *bmap         ├──────►│  nil   │</span><br><span class="line">                         └───────────────────────────────┘       └────────┘</span><br></pre></td></tr></table></figure>
+
+<p>其中B是bucket数组长度的对数，bucket里面存储了key和value。可以看见一个bucket里面最多能装8个key，这8个key在bucket里面的位置根据hash值的高8位决定。nevacuate表示扩容进度，小于此地址的 buckets 迁移完成。Ascii风格的map内存模型图是参考曹大github里的，曹大yyds。</p>
+<p>其中bucket指针指向的结构体如下：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// A bucket for a Go map.</span></span><br><span class="line"><span class="keyword">type</span> bmap <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// tophash generally contains the top byte of the hash value</span></span><br><span class="line">	<span class="comment">// for each key in this bucket. If tophash[0] &lt; minTopHash,</span></span><br><span class="line">	<span class="comment">// tophash[0] is a bucket evacuation state instead.</span></span><br><span class="line">	tophash [bucketCnt]<span class="keyword">uint8</span></span><br><span class="line">	<span class="comment">// Followed by bucketCnt keys and then bucketCnt elems.</span></span><br><span class="line">	<span class="comment">// <span class="doctag">NOTE:</span> packing all the keys together and then all the elems together makes the</span></span><br><span class="line">	<span class="comment">// code a bit more complicated than alternating key/elem/key/elem/... but it allows</span></span><br><span class="line">	<span class="comment">// us to eliminate padding which would be needed for, e.g., map[int64]int8.</span></span><br><span class="line">	<span class="comment">// Followed by an overflow pointer.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">┌───────┐</span><br><span class="line">│ bmap  │</span><br><span class="line">├───────┴───────────────────────┐</span><br><span class="line">│   tophash [bucketCnt]uint8    │</span><br><span class="line">├───────┬───────────────────────┤</span><br><span class="line">│ key   │                       │</span><br><span class="line">├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">│ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">├───┴───┼───┴───┴───┴───┴───┴───┤</span><br><span class="line">│ values│                       │</span><br><span class="line">├───┬───┼───┬───┬───┬───┬───┬───┤</span><br><span class="line">│ 0 │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │</span><br><span class="line">├───┴───┴───┴───┴───┴───┴───┴───┤</span><br><span class="line">│        overflow *bmap         │</span><br><span class="line">└───────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>其中key和value是各自存放在一起的，为什么要这么做呢，以下是在注释中的官方解释。</p>
+<blockquote>
+<pre><code>NOTE: packing all the keys together and then all the elems together makes the
+code a bit more complicated than alternating key/elem/key/elem/... but it allows
+us to eliminate padding which would be needed for, e.g., map[int64]int8.
+</code></pre>
+</blockquote>
+<p>主要是为了减少内存对齐带来的padding。注释中给了一个例子<code>map[int64]int8</code>，如果是按照<code>key/elem/key/elem/</code>这种方式存储，相当于每一个<code>key/elem</code>都需要padding7个字节。64位的机器上，默认的对齐系数是8，同时<code>int8</code>的对齐系数是1，<code>int64</code>的对齐系数是8。以下是<code>key/elem</code>方式产生padding的过程：</p>
+<ul>
+<li>第一个key，key1(int64)的大小和对齐值是8，占据8位。暂且写做：kkkkkkkk</li>
+<li>第一个value，value1(int8)的大小和对齐值是1，占据1位。写做：kkkkkkkk｜v</li>
+<li>第二个key，key2(int64)的大小和对齐值是8，偏移量必须是8的倍数。也就产生了padding。不能直接接着value1后面写了，写作：kkkkkkkk｜vxxxxxxx｜kkkkkkkk。其中x表示padding。后面也就是依次类推了。</li>
+</ul>
+<p>如果是按照<code>key/key/key/.../key/elem/elem/.../elem</code>来进行存储的话，只需要在最后面添加padding就行。内存对齐一般好像不怎么会考虑，但是了解还是需要了解的，TODO List再加一项。</p>
+<h2 id="0x1-map中key的位置"><a href="#0x1-map中key的位置" class="headerlink" title="0x1.map中key的位置"></a>0x1.map中key的位置</h2><p>在64位的机器上面，key经过hash计算后会得到一个64bit的哈希值。在key的定位过程中会用到哈希值的高8位和后B位。B就是hmap中的B，如果B=6，buckets数组的长度就是2^6=64。</p>
+<p>举个🌰,现在有一个key的哈希值如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">00000111 | 00001111111011001111111111101010001000000001010000 | 000010</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">                                    key</span><br><span class="line"></span><br><span class="line">┌────────────────────────────────────────────────────────────────────────┐</span><br><span class="line">│ 00000111 | 00001111111011001111111111101010001000000001010000 | 000010 │</span><br><span class="line">└────┬──────────────────────────────────────────────────────────────┬────┘</span><br><span class="line">     │                                                              │</span><br><span class="line">     │                                                              ▼</span><br><span class="line">     │                                     B&#x3D;6          ┌────────────────┐</span><br><span class="line">     │                              bucketMask&#x3D;111111   │ 000010&amp;111111  │</span><br><span class="line">     │                                                  └────────────┬───┘</span><br><span class="line">     │ tophash                                                       │</span><br><span class="line">     │                                                               ▼</span><br><span class="line">     │                                                          ┌────────┐</span><br><span class="line">     │                                    ┌─────────────────────┤000010&#x3D;2│</span><br><span class="line">     ▼                                    │                     └────────┘</span><br><span class="line">┌────────────┐                 buckets    ▼</span><br><span class="line">│ 00000111&#x3D;7 │                  ┌───┬───┬───┬───┬──────────┬────┬────┬────┐</span><br><span class="line">└─────┬──────┘                  │ 0 │ 1 │ 2 │ 3 │    ...   │ 61 │ 62 │ 63 │</span><br><span class="line">      │                         └───┴───┴─┬─┴───┴──────────┴────┴────┴────┘</span><br><span class="line">      │                                   │</span><br><span class="line">      │                                   │</span><br><span class="line">      └─────────────────────────────┐     │</span><br><span class="line">                                    │     ▼</span><br><span class="line">           ┌────────────────────────┼────────────┬──────┐</span><br><span class="line">           │                        │            │bucket│</span><br><span class="line">           │  ┌───────┐             │            ├──────┘</span><br><span class="line">           │  │ bmap  │             ▼            │</span><br><span class="line">           │  ├───┬───┼───┬───┬───┬───┬───┬───┐  │</span><br><span class="line">           │  │111│ 9 │ 3 │ 5 │ 6 │ 7 │ 0 │ 0 │  │</span><br><span class="line">           │  ├───┴───┼───┴───┴───┴───┴───┴───┤  │</span><br><span class="line">           │  │ key   │                       │  │</span><br><span class="line">           │  ├───┬───┼───┬───┬───┬───┬───┬───┤  │</span><br><span class="line">           │  │ 5 │ 2 │ 1 │ 4 │ 3 │ 9 │ 0 │ 0 │  │</span><br><span class="line">           │  ├───┴───┼───┴───┴───┴───┴───┴───┤  │</span><br><span class="line">           │  │ values│                       │  │</span><br><span class="line">           │  ├───┬───┼───┬───┬───┬───┬───┬───┤  │</span><br><span class="line">           │  │ 3 │ 5 │ 4 │ 7 │ 9 │ 6 │ 0 │ 0 │  │</span><br><span class="line">           │  ├───┴───┴───┴───┴───┴───┴───┴───┤  │</span><br><span class="line">           │  │        overflow *bmap         │  │</span><br><span class="line">           │  └───────────────────────────────┘  │</span><br><span class="line">           │                                     │</span><br><span class="line">           └─────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>如果在 bucket 中没找到，并且 overflow 不为空，还要继续去 overflow bucket 中寻找，直到找到或是所有的 key 槽位都找遍了，包括所有的 overflow bucket。</p>
+<p>实现上有 mapaccess1，mapaccess2，mapaccessK 几个方法，主要区别是在返回内容上。当要查询的 key 不在 map 里，mapaccess2的用法会返回一个 bool 型变量提示 key 是否在 map 中；而mapaccess1 的语句则会返回一个 key 对应 value 类型的零值。如果 value 是 int 型就会返回 0，如果 value 是 string 类型，就会返回空字符串。mapaccess2就是日常代码中<code>v, ok := map[k]</code>的底层函数。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/15/Go_Slice_growup/" rel="prev" title="Go Slice的扩容策略">
+      <i class="fa fa-chevron-left"></i> Go Slice的扩容策略
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  Copyright&copy; 2020–
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Egan Dong</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
