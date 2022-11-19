@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=SimHei:300,300italic,400,400italic,700,700italic|0.7:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在使用slice的时候，如果向slice中追加元素的时候，导致元素数量大于cap，这时候就会发生slice的扩容。那么在go语言中，什么时候map会发生扩容呢？扩容的策略有哪些呢？扩容的过程是怎样的呢？很是好奇，心动不如行动。开始学习，又是收获满满的一天。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Map扩容">
+<meta property="og:url" content="https://blog.eganx.cn/2022/10/24/Go_Map_Grow/index.html">
+<meta property="og:site_name" content="Egan&#39;s Blog">
+<meta property="og:description" content="在使用slice的时候，如果向slice中追加元素的时候，导致元素数量大于cap，这时候就会发生slice的扩容。那么在go语言中，什么时候map会发生扩容呢？扩容的策略有哪些呢？扩容的过程是怎样的呢？很是好奇，心动不如行动。开始学习，又是收获满满的一天。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-24T07:53:19.000Z">
+<meta property="article:modified_time" content="2022-11-19T14:51:16.165Z">
+<meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.eganx.cn/2022/10/24/Go_Map_Grow/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Go Map扩容 | Egan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Egan's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <h1 class="site-title">Egan's Blog</h1>
+    </a>
+      <p class="site-subtitle" itemprop="description">一个人的小破站</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+				<!-- Matomo -->
+				<script>
+						var _paq = window._paq = window._paq || [];
+						/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+					  _paq.push(['trackPageView']);
+					  _paq.push(['enableLinkTracking']);
+					  (function() {
+							 var u="https://matomo.eganx.cn:7003/matomo/";
+							 _paq.push(['setTrackerUrl', u+'matomo.php']);
+							 _paq.push(['setSiteId', '1']);
+							 var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+							 g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+					 })();
+			 </script>
+			 <!-- End Matomo Code -->
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/10/24/Go_Map_Grow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go Map扩容
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-24 15:53:19" itemprop="dateCreated datePublished" datetime="2022-10-24T15:53:19+08:00">2022-10-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在使用slice的时候，如果向slice中追加元素的时候，导致元素数量大于cap，这时候就会发生slice的扩容。那么在go语言中，什么时候map会发生扩容呢？扩容的策略有哪些呢？扩容的过程是怎样的呢？很是好奇，心动不如行动。开始学习，又是收获满满的一天。</p>
+<span id="more"></span>
+
+<h2 id="0x0-触发扩容的条件"><a href="#0x0-触发扩容的条件" class="headerlink" title="0x0.触发扩容的条件"></a>0x0.触发扩容的条件</h2><p>众所周知，map是使用hash表的。使用hash表的目的就是追求更加快速的找到key，但是当map中key的数量逐渐增加，逐渐离谱的时候，那么碰撞的几率就越来越大，效率也就随之下降了。最离谱的时候就是所有的key都在一个bucket里面 (<del>这是碳基生物能干出来的事?这和链表有个锤子的区别吗？</del>)，最好就是一个bucket里面就一个key，找到了bucket就找到了key，效率贼高，直接拉到o(1)。但是空间不允许啊，为了效率用空间换时间不寒碜？(<del>很寒碜，贼TM寒碜</del>)。</p>
+<p>最好最坏都属于极端，其实都很难遇到，只是在举🌰的时候夸张表述才会用到。在go语言中，有一个<code>loadFactor</code>指标来对上面的两种情况进行衡量。废话不多说，直接上源码(/go1.18.2/src/runtime/map.go)</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断条件在mapassign函数中。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// If we hit the max load factor or we have too many overflow buckets,</span></span><br><span class="line"><span class="comment">// and we&#x27;re not already in the middle of growing, start growing.</span></span><br><span class="line"><span class="keyword">if</span> !h.growing() &amp;&amp; (overLoadFactor(h.count+<span class="number">1</span>, h.B) || tooManyOverflowBuckets(h.noverflow, h.B)) &#123;</span><br><span class="line">	hashGrow(t, h)</span><br><span class="line">	<span class="keyword">goto</span> again <span class="comment">// Growing the table invalidates everything, so try again</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上面的条件可以看出，map扩容一个是在<code>overLoadFactor</code>的时候，一个是在<code>tooManyOverflowBuckets</code>。下面是这两个函数所用到的常量以及主要的引用函数。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line"><span class="comment">// Maximum number of key/elem pairs a bucket can hold.</span></span><br><span class="line">	bucketCntBits = <span class="number">3</span></span><br><span class="line">	bucketCnt     = <span class="number">1</span> &lt;&lt; bucketCntBits <span class="comment">//8</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Maximum average load of a bucket that triggers growth is 6.5.</span></span><br><span class="line">	<span class="comment">// Represent as loadFactorNum/loadFactorDen, to allow integer math.</span></span><br><span class="line">	loadFactorNum = <span class="number">13</span></span><br><span class="line">	loadFactorDen = <span class="number">2</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// PtrSize is the size of a pointer in bytes - unsafe.Sizeof(uintptr(0)) but as an ideal constant.</span></span><br><span class="line"><span class="comment">// It is also the size of the machine&#x27;s native word size (that is, 4 on 32-bit systems, 8 on 64-bit).</span></span><br><span class="line"><span class="keyword">const</span> PtrSize = <span class="number">4</span> &lt;&lt; (^<span class="keyword">uintptr</span>(<span class="number">0</span>) &gt;&gt; <span class="number">63</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// bucketShift returns 1&lt;&lt;b, optimized for code generation.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">bucketShift</span><span class="params">(b <span class="keyword">uint8</span>)</span> <span class="title">uintptr</span></span> &#123;</span><br><span class="line">	<span class="comment">// Masking the shift amount allows overflow checks to be elided.</span></span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">uintptr</span>(<span class="number">1</span>) &lt;&lt; (b &amp; (goarch.PtrSize*<span class="number">8</span> - <span class="number">1</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// overLoadFactor reports whether count items placed in 1&lt;&lt;B buckets is over loadFactor.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">overLoadFactor</span><span class="params">(count <span class="keyword">int</span>, B <span class="keyword">uint8</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> count &gt; bucketCnt &amp;&amp; <span class="keyword">uintptr</span>(count) &gt; loadFactorNum*(bucketShift(B)/loadFactorDen)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// tooManyOverflowBuckets reports whether noverflow buckets is too many for a map with 1&lt;&lt;B buckets.</span></span><br><span class="line"><span class="comment">// Note that most of these overflow buckets must be in sparse use;</span></span><br><span class="line"><span class="comment">// if use was dense, then we&#x27;d have already triggered regular map growth.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">tooManyOverflowBuckets</span><span class="params">(noverflow <span class="keyword">uint16</span>, B <span class="keyword">uint8</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	<span class="comment">// If the threshold is too low, we do extraneous work.</span></span><br><span class="line">	<span class="comment">// If the threshold is too high, maps that grow and shrink can hold on to lots of unused memory.</span></span><br><span class="line">	<span class="comment">// &quot;too many&quot; means (approximately) as many overflow buckets as regular buckets.</span></span><br><span class="line">	<span class="comment">// See incrnoverflow for more details.</span></span><br><span class="line">	<span class="keyword">if</span> B &gt; <span class="number">15</span> &#123;</span><br><span class="line">		B = <span class="number">15</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// The compiler doesn&#x27;t see here that B &lt; 16; mask B to generate shorter shift code.</span></span><br><span class="line">	<span class="keyword">return</span> noverflow &gt;= <span class="keyword">uint16</span>(<span class="number">1</span>)&lt;&lt;(B&amp;<span class="number">15</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1）第一种情况"><a href="#1）第一种情况" class="headerlink" title="1）第一种情况"></a>1）第一种情况</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// overLoadFactor reports whether count items placed in 1&lt;&lt;B buckets is over loadFactor.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">overLoadFactor</span><span class="params">(count <span class="keyword">int</span>, B <span class="keyword">uint8</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">  <span class="comment">// 换算一下下: count &gt; 8 &amp;&amp; count &gt; 13*((2^B)/2)</span></span><br><span class="line">  <span class="comment">// loadFactor = count/(2^B) &gt; 6.5</span></span><br><span class="line">	<span class="keyword">return</span> count &gt; bucketCnt &amp;&amp; <span class="keyword">uintptr</span>(count) &gt; loadFactorNum*(bucketShift(B)/loadFactorDen)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>count</code>是map的元素个数，<code>1&lt;&lt;B</code>表示bucket数组长度。也就是说<font color=red>在<code>loadFactor := count/(2^B)</code>超过6.5的时候，会触发map的扩容</font>。按照<code>loadFactor</code>的计算方式，当所有bucket都满的时候是8。达到6.5的时候也就差不多算是满了大半了，无论查找还是插入，这个时候碰撞的几率很高，效率也会下降的厉害，所以这是触发扩容的时机。</p>
+<p>如果不停的插入元素、删除元素，然后在插入元素。刚开始插入元素的时候会创建大量bucket。但是只要没有达到第一种扩容情况，也就是说loadFactor的值低于6.5。这个时候进行删除元素的操作，降低loadFactor的分子。然后重复操作，就会产生大量overflow bucket。这个时候key就会过于分散，导致查找和插入的效率过低。为了避免这种情况的发生，就有了下面第二种触发扩容的条件。</p>
+<h3 id="2-第二种情况"><a href="#2-第二种情况" class="headerlink" title="2) 第二种情况"></a>2) 第二种情况</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// tooManyOverflowBuckets reports whether noverflow buckets is too many for a map with 1&lt;&lt;B buckets.</span></span><br><span class="line"><span class="comment">// Note that most of these overflow buckets must be in sparse use;</span></span><br><span class="line"><span class="comment">// if use was dense, then we&#x27;d have already triggered regular map growth.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">tooManyOverflowBuckets</span><span class="params">(noverflow <span class="keyword">uint16</span>, B <span class="keyword">uint8</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	<span class="comment">// If the threshold is too low, we do extraneous work.</span></span><br><span class="line">	<span class="comment">// If the threshold is too high, maps that grow and shrink can hold on to lots of unused memory.</span></span><br><span class="line">	<span class="comment">// &quot;too many&quot; means (approximately) as many overflow buckets as regular buckets.</span></span><br><span class="line">	<span class="comment">// See incrnoverflow for more details.</span></span><br><span class="line">	<span class="keyword">if</span> B &gt; <span class="number">15</span> &#123;</span><br><span class="line">		B = <span class="number">15</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// The compiler doesn&#x27;t see here that B &lt; 16; mask B to generate shorter shift code.</span></span><br><span class="line">	<span class="keyword">return</span> noverflow &gt;= <span class="keyword">uint16</span>(<span class="number">1</span>)&lt;&lt;(B&amp;<span class="number">15</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>翻译成人话：overflow的bucket数量太多了。<font color=red>当<code>B &gt;= 15</code>的时候，如果overflow的bucket数量超过<code>2^15</code>就触发扩容；当<code>B &lt; 15</code>的时候，如果overflow的bucket数量超过<code>2^B</code>就触发扩容。</font>第二种的这个情况主要是为了避免loadFactor的分子小的时候，却有大量的bucket(包括大量的overflow bucket)。</p>
+<h2 id="0x1-扩容策略"><a href="#0x1-扩容策略" class="headerlink" title="0x1.扩容策略"></a>0x1.扩容策略</h2><p>针对两种不同的触发扩容的条件，进行扩容的策略也有所不同。</p>
+<p>第一种情况是由于元素数量过多，导致了bucket数组快满了。这个时候采用的扩容策略就是<code>B+1</code>，bucket的数组长度变成之前的2倍（<font color=red>2倍扩容</font>）</p>
+<p>第二种情况是由于flowbucket的过多造成，元素没有那么多，主要是位置分散，造成查找和插入的效率较低。采用第一种的扩容策略肯定是不行的，解决的办法是采用<font color=red>等量扩容</font>，创建一个和老buckets数组相同长度的新buckets数组。将老buckets中处于同一个bucket的元素进行紧密排列，尽可能的消除overflow bucket，节省空间，提高效率。</p>
+<p>map的扩容不是原子操作，不会一步到位。扩容需要将原本的键值对迁移到新bucket得内存地址中，大量键值对同时迁移会影响性能，所以Go map的扩容是采用“渐进式”方式。每次最多只会迁移2个bucket。</p>
+<h2 id="0x2-迁移过程"><a href="#0x2-迁移过程" class="headerlink" title="0x2.迁移过程"></a>0x2.迁移过程</h2><p>第一种扩容策略，因为<code>B+1</code>会导致key的hash值需要重新计算，才能确定它会落入那个bucket中，毕竟确定bucket位置的是根据hash值的后B位。这样的话就会导致某些key在迁移前后的bucket序号是不一样的。</p>
+<p>举个🌰：初始状态下B=2，3号bucket里有两个key的hash值后3位值<code>011,111</code>，经过B+1扩容之后，这两个原本处于3号bucket的key会分别落入3号和7号bucket。key在迁移前后是否还是处于原本的bucket取决于倒数第3位是0还是1。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">                     ┌───────────────────────┐</span><br><span class="line">                     │                       │</span><br><span class="line">               ┌─────┼─────────────────┐     │</span><br><span class="line">               │     │                 │     │</span><br><span class="line">         ┌─────┼─────┼───────────┐     │     │</span><br><span class="line">         │     │     │           │     │     │</span><br><span class="line">   ┌─────┼─────┼─────┼─────┐     │     │     │</span><br><span class="line">   │     │     │     │     │     │     │     │</span><br><span class="line">┌──┴──┬──┴──┬──┴──┬──┴──┐  │     │     │     │</span><br><span class="line">│     │     │     │     │  │     │     │     │</span><br><span class="line">│  0  │  1  │  2  │  3  │  │     │     │     │</span><br><span class="line">│     │     │     │     │  │     │     │     │</span><br><span class="line">└──┬──┴──┬──┴──┬──┴──┬──┘  │     │     │     │</span><br><span class="line">   │     │     │     │     │     │     │     │</span><br><span class="line">   │     │     │     │     │     │     │     │</span><br><span class="line">   │     │     │     │     │     │     │     │</span><br><span class="line">   │     │     │     │     │     │     │     │</span><br><span class="line">   ▼     ▼     ▼     ▼     ▼     ▼     ▼     ▼</span><br><span class="line">┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐</span><br><span class="line">│     │     │     │     │     │     │     │     │</span><br><span class="line">│  0  │  1  │  2  │  3  │  4  │  5  │  6  │  7  │</span><br><span class="line">│     │     │     │     │     │     │     │     │</span><br><span class="line">└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘</span><br></pre></td></tr></table></figure>
+
+
+
+<p>第二种扩容策略，等量扩容因为B是不变的，所以key还是在原来的bucket。主要是为了收拢过于分散的key(<font color=linblue>大多数都分散在overflow bucket中</font>)。下面的图是迁移完成的情况。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">buckets     B&#x3D;2                         buckets     B&#x3D;2</span><br><span class="line">┌─────┬─────┬─────┬─────┐               ┌─────┬─────┬─────┬─────┐</span><br><span class="line">│     │     │     │     │               │     │     │     │     │</span><br><span class="line">│  0  │  1  │  2  │  3  │               │  0  │  1  │  2  │  3  │</span><br><span class="line">│     │     │     │     │               │     │     │     │     │</span><br><span class="line">└─────┴─────┴─────┴──┬──┘               └─────┴─────┴─────┴──┬──┘</span><br><span class="line">                     │                                       │</span><br><span class="line">   ┌─────────────────┘                               ┌───────┘</span><br><span class="line">   │                                                 │</span><br><span class="line">   ▼                                                 ▼</span><br><span class="line">┌────┐      ┌────┐     ┌────┐                     ┌────┐</span><br><span class="line">│bmap│   ┌─►│bmap│  ┌─►│bmap│                     │bmap│</span><br><span class="line">├────┴┐  │  ├────┴┐ │  ├────┴┐                    ├────┴┐</span><br><span class="line">│key:a│  │  │     │ │  │key:f│                    │key:a│</span><br><span class="line">│ 111 │  │  │     │ │  │ 111 │                    │ 111 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│key:b│  │  │     │ │  │     │                    │key:b│</span><br><span class="line">│ 011 │  │  │     │ │  │     │                    │ 011 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│     │  │  │key:d│ │  │     │                    │key:c│</span><br><span class="line">│     │  │  │ 111 │ │  │     │                    │ 011 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│     │  │  │     │ │  │     │                    │key:d│</span><br><span class="line">│     │  │  │     │ │  │     │                    │ 111 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│key:c│  │  │key:e│ │  │     │                    │key:e│</span><br><span class="line">│ 011 │  │  │ 111 │ │  │     │                    │ 111 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│     │  │  │     │ │  │key:g│                    │key:f│</span><br><span class="line">│     │  │  │     │ │  │ 011 │                    │ 111 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│     │  │  │     │ │  │     │                    │key:g│</span><br><span class="line">│     │  │  │     │ │  │     │                    │ 011 │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│     │  │  │     │ │  │     │                    │     │</span><br><span class="line">│     │  │  │     │ │  │     │                    │     │</span><br><span class="line">├─────┤  │  ├─────┤ │  ├─────┤                    ├─────┤</span><br><span class="line">│*over│  │  │*over│ │  │*over│                    │*over│</span><br><span class="line">│flow ├──┘  │flow ├─┘  │flow │                    │flow │</span><br><span class="line">└─────┘     └─────┘    └─────┘                    └─────┘</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/22/Go_Map/" rel="prev" title="Go Map的基本结构和key的定位过程">
+      <i class="fa fa-chevron-left"></i> Go Map的基本结构和key的定位过程
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  Copyright&copy; 2020–
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Egan Dong</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
