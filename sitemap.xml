@@ -158,20 +158,6 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/tags/OOM/</loc>
-    <lastmod>2022-11-20</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/GC/</loc>
-    <lastmod>2022-11-20</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/tags/Serial/</loc>
     <lastmod>2022-11-20</lastmod>
     <changefreq>daily</changefreq>
@@ -187,6 +173,20 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/map/</loc>
+    <lastmod>2022-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/GC/</loc>
+    <lastmod>2022-11-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/OOM/</loc>
     <lastmod>2022-11-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
