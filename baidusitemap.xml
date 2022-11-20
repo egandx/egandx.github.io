@@ -1,51 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://blog.eganx.cn/2022/10/24/Go_Map_Grow/</loc>
-    <lastmod>2022-11-19</lastmod>
+    <loc>https://blog.eganx.cn/2022/10/26/Go_Map_Range/</loc>
+    <lastmod>2022-11-20</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2022/10/22/Go_Map/</loc>
-    <lastmod>2022-11-18</lastmod>
+    <lastmod>2022-11-20</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/10/24/Go_Map_Grow/</loc>
+    <lastmod>2022-11-20</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2022/10/15/Go_Slice_growup/</loc>
-    <lastmod>2022-11-18</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
-    <lastmod>2022-11-15</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/</loc>
-    <lastmod>2022-11-15</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2021/03/01/Reverse%20Polish%20notation/</loc>
-    <lastmod>2022-11-15</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2021/02/22/Ming's_random_numbers/</loc>
-    <lastmod>2022-11-15</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2021/03/09/Huawei_OD_exam/</loc>
-    <lastmod>2022-11-15</lastmod>
+    <lastmod>2022-11-20</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2022/01/01/CSharp_Serial_port_readwrite_continuity_problem/</loc>
-    <lastmod>2022-11-15</lastmod>
+    <lastmod>2022-11-20</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2022/01/03/CSharp_OOM/</loc>
-    <lastmod>2022-11-15</lastmod>
+    <lastmod>2022-11-20</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2022/02/08/CSharp_GC_mechanism/</loc>
-    <lastmod>2022-11-15</lastmod>
+    <lastmod>2022-11-20</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2021/02/22/Ming's_random_numbers/</loc>
+    <lastmod>2022-11-20</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2021/03/01/Reverse%20Polish%20notation/</loc>
+    <lastmod>2022-11-20</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2021/03/02/Basic_calculator_II/</loc>
+    <lastmod>2022-11-20</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2021/03/09/Huawei_OD_exam/</loc>
+    <lastmod>2022-11-20</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2020/12/22/Six_months_after_graduation/</loc>
+    <lastmod>2022-11-20</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/01/05/Go_Version_switching/</loc>
     <lastmod>2022-11-15</lastmod>
   </url>
   <url>
