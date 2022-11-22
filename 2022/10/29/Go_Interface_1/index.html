@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=SimHei:300,300italic,400,400italic,700,700italic|0.7:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Go语言中，接口是不需要像传统的静态编程语言一样进行声明后才能使用。它引用了动态语言的接口使用方式，只需要实现接口要求的相关方法就行，同时还会在编译阶段进行类型匹配，个人觉得非常好用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Interface理解(1)">
+<meta property="og:url" content="https://blog.eganx.cn/2022/10/29/Go_Interface_1/index.html">
+<meta property="og:site_name" content="Egan&#39;s Blog">
+<meta property="og:description" content="Go语言中，接口是不需要像传统的静态编程语言一样进行声明后才能使用。它引用了动态语言的接口使用方式，只需要实现接口要求的相关方法就行，同时还会在编译阶段进行类型匹配，个人觉得非常好用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-29T11:23:19.000Z">
+<meta property="article:modified_time" content="2022-11-22T06:10:18.113Z">
+<meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="interface">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.eganx.cn/2022/10/29/Go_Interface_1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Go Interface理解(1) | Egan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Egan's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <h1 class="site-title">Egan's Blog</h1>
+    </a>
+      <p class="site-subtitle" itemprop="description">The winter is coming</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+				<!-- Matomo -->
+				<script>
+						var _paq = window._paq = window._paq || [];
+						/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+					  _paq.push(['trackPageView']);
+					  _paq.push(['enableLinkTracking']);
+					  (function() {
+							 var u="https://matomo.eganx.cn:7003/matomo/";
+							 _paq.push(['setTrackerUrl', u+'matomo.php']);
+							 _paq.push(['setSiteId', '1']);
+							 var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+							 g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+					 })();
+			 </script>
+			 <!-- End Matomo Code -->
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/10/29/Go_Interface_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go Interface理解(1)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-29 19:23:19" itemprop="dateCreated datePublished" datetime="2022-10-29T19:23:19+08:00">2022-10-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Go语言中，接口是不需要像传统的静态编程语言一样进行声明后才能使用。它引用了动态语言的接口使用方式，只需要实现接口要求的相关方法就行，同时还会在编译阶段进行类型匹配，个人觉得非常好用。</p>
+<span id="more"></span>
+
+<h2 id="0x0-Interface-amp-Duck-Typing"><a href="#0x0-Interface-amp-Duck-Typing" class="headerlink" title="0x0.Interface &amp; Duck Typing"></a>0x0.Interface &amp; Duck Typing</h2><p>所谓Go语言式的接口，就是不用显示声明类型<code>T</code>实现了接口<code>I</code>，只要类型<code>T</code>的公开方法完全满足接口<code>I</code>的要求，就可以把类型<code>T</code>的对象用在需要接口<code>I</code>的地方。这种做法的学名叫做<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Structural_type_system">Structural Typing</a>，也有人称它为一种静态的Duck Typing。</p>
+<p>Duck Typing一般常见于动态语言中（比如python），但是动态语言不会在编译阶段去进行类型匹配，只有在运行到当前行代码的时候才会报错。而传统的静态语言（比如Java），必须显示地去声明实现了某个接口，然后才可以去使用。这跟动态语言静态语言的讨论类似，可以讨论优缺点，但是不能以好坏去下结论。</p>
+<p>Go语言本身作为一种静态语言，静态语言的类型检查是肯定有的。但是在接口的使用上，引用了动态语言的接口使用方式。即不要求类型显示地去声明实现了某个接口，只需要实现接口要求的相关方法就行，编译阶段会去进行类型检查。如果没有实现相关方法，编译是会报错的。</p>
+<p>举个🌰：</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> IDuck <span class="keyword">interface</span> &#123;</span><br><span class="line">	gaga()</span><br><span class="line">	swimming()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Duck <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d Duck)</span> <span class="title">gaga</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;Duck gaga&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *Duck)</span> <span class="title">swimming</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;Duck swimming&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> _ IDuck = (*Duck)(<span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font color=red><code>var _ IDuck = (*Duck)(nil)  //这个很实用，编译器会由此检查 *Duck类型是否实现了 IDuck 接口。</code></font></p>
+<p>以上的代码编译可以通过，表示A实现了Duck接口，那么A就是一只鸭子🦆。</p>
+<p>但是当注释了A的游泳方法时，就会出现编译器会直接爆出以下错误，表示A并没有完全实现Duck接口，A不是一只鸭子🦆。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// func (d *Duck) swimming() &#123;</span></span><br><span class="line"><span class="comment">// 	fmt.Println(&quot;Duck swimming&quot;)</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> _ IDuck = (*Duck)(<span class="literal">nil</span>) <span class="comment">//编译报错：cannot use (*A)(nil) (value of type *A) as Duck value in variable declaration: *A does not implement Duck (missing method swimming) compiler(InvalidIfaceAssign)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="0x1-方法"><a href="#0x1-方法" class="headerlink" title="0x1.方法"></a>0x1.方法</h2><p>接口方法方便接口添加新的行为。方法有接收者，当没有了接收者，方法就变成了函数。接收者有两种类型，一种是值接收者，另一种是指针接收者。</p>
+<p>方法的调用者不必满足接收者类型。换句话说，无论方法的接收者是什么类型，该类型的值和指针都可以调用。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> _ IDuck = (*Duck)(<span class="literal">nil</span>) </span><br><span class="line">  </span><br><span class="line">  d := Duck&#123;&#125; <span class="comment">//d := &amp;Duck&#123;&#125; 也是可以的</span></span><br><span class="line">	d.gaga() </span><br><span class="line">	d.swimming()</span><br><span class="line">&#125;	</span><br></pre></td></tr></table></figure>
+
+<p>当方法的接收者是值类型的时候，无论调用者是值类型还是指针类型，该方法操作的都是对应接收者的值的副本。即使你用指针类型去调用，方法内部操作还是对副本的操作，而不是指针操作。同理，当接收者是指针时，即使用值类型调用，方法内部也是对指针的操作，修改的是值指针指向的值本身。</p>
+<h2 id="0x2-接口实现"><a href="#0x2-接口实现" class="headerlink" title="0x2.接口实现"></a>0x2.接口实现</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> IDuck <span class="keyword">interface</span> &#123;</span><br><span class="line">	gaga()</span><br><span class="line">	swimming()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Duck <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d Duck)</span> <span class="title">gaga</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;A gaga&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *Duck)</span> <span class="title">swimming</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;A swimming&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	d := &amp;Duck&#123;&#125;</span><br><span class="line">	dd := Duck&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> _ IDuck = (*Duck)(d) <span class="comment">//OK</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> _ IDuck = (Duck)(dd) <span class="comment">//编译报错：cannot use (Duck)(dd) (value of type Duck) as IDuck value in variable declaration: Duck does not implement IDuck (method swimming has pointer receiver)compilerInvalidIfaceAssign</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译器不考虑我们的值是实现该接口的类型，接口的调用规则是建立在这些方法的接受者和接口如何被调用的基础上。下面的是语言规范里定义的规则，这些规则用来说明是否我们一个类型的值或者指针该接口：</p>
+<ul>
+<li>接收者是指针 <code>*T</code> 时，接口的实例必须是指针</li>
+<li>接收者是值 <code>T</code> 时，接口的实例可以是指针也可以是值</li>
+</ul>
+<blockquote>
+<p> 也就是说：实现了接收者是值类型的方法，相当于自动实现了接收者是指针类型的方法；而实现了接收者是指针类型的方法，不会自动生成对应接收者是值类型的方法。</p>
+</blockquote>
+<p><font color=green>Q&amp;A：既然实现接收者是值类型的方法时，会自动实现接收者是指针类型的方法，那么为啥要用指针类型去做接收者？什么时候会去使用指针作为方法的接收者？</font></p>
+<blockquote>
+<p>方法的接收者是值类型的时候，修改的永远是对象的副本，不会对调用者有影响。但是接收者是指针的时候，在方法里修改，就是修改了指针指向的对象本身。当类型是大型的结构体或者不能被安全的复制时，就定义指针接收者方法，例如文件结构体（struct File）。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/interface/" rel="tag"># interface</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/26/Go_Map_Range/" rel="prev" title="Go Map的遍历">
+      <i class="fa fa-chevron-left"></i> Go Map的遍历
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/10/30/Go_Interface_2/" rel="next" title="Go Interface理解(2)">
+      Go Interface理解(2) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  Copyright&copy; 2020–
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Egan Dong</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

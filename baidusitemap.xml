@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.eganx.cn/2022/10/30/Go_Interface_2/</loc>
+    <lastmod>2022-11-22</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/10/29/Go_Interface_1/</loc>
+    <lastmod>2022-11-22</lastmod>
+  </url>
+  <url>
     <loc>https://blog.eganx.cn/2022/10/26/Go_Map_Range/</loc>
     <lastmod>2022-11-20</lastmod>
   </url>
