@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Go语言的并发是最好用的，而channel也算是Go语言并发机制的半壁江山了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Channel数据结构和创建">
+<meta property="og:url" content="https://blog.eganx.cn/2022/11/01/Go_Channel_DS/index.html">
+<meta property="og:site_name" content="Egan&#39;s Blog">
+<meta property="og:description" content="Go语言的并发是最好用的，而channel也算是Go语言并发机制的半壁江山了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-01T13:09:13.000Z">
+<meta property="article:modified_time" content="2022-11-24T06:59:34.802Z">
+<meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="channel">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.eganx.cn/2022/11/01/Go_Channel_DS/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Go Channel数据结构和创建 | Egan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Egan's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <h1 class="site-title">Egan's Blog</h1>
+    </a>
+      <p class="site-subtitle" itemprop="description">The winter is coming</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+				<!-- Matomo -->
+				<script>
+						var _paq = window._paq = window._paq || [];
+						/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+					  _paq.push(['trackPageView']);
+					  _paq.push(['enableLinkTracking']);
+					  (function() {
+							 var u="https://matomo.eganx.cn:7003/matomo/";
+							 _paq.push(['setTrackerUrl', u+'matomo.php']);
+							 _paq.push(['setSiteId', '1']);
+							 var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+							 g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+					 })();
+			 </script>
+			 <!-- End Matomo Code -->
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/01/Go_Channel_DS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go Channel数据结构和创建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-01 21:09:13" itemprop="dateCreated datePublished" datetime="2022-11-01T21:09:13+08:00">2022-11-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Go语言的并发是最好用的，而channel也算是Go语言并发机制的半壁江山了。</p>
+<span id="more"></span>
+
+<h2 id="0x0-CSP"><a href="#0x0-CSP" class="headerlink" title="0x0.CSP"></a>0x0.CSP</h2><p>CSP全称“Communicating Sequential Processes”，中文可以叫做通信顺序进程。go的并发是基于channel实现，依赖的就是CSP模型。CSP描述了并发系统中的互动模式，实际上Go只是用到了CSP理论中一部分，即理论中的Process/Channel，在Go中对应goroutine/channel。这两个并发原语之间没有从属关系， Process 可以订阅任意个 Channel，Channel 也并不关心是哪个 Process 在利用它进行通信；Process 围绕 Channel 进行读写，形成一套有序阻塞和可预测的并发模型。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">┌─────────────┐     ┌─────────────┐      ┌─────────────┐</span><br><span class="line">│             │     │             │      │             │</span><br><span class="line">│  Goroutine  ├────►│   Channel   ├─────►│  Goroutine  │</span><br><span class="line">│             │     │             │      │             │</span><br><span class="line">└─────────────┘     └─────────────┘      └─────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>Goroutine + channel支撑起了Go语言的并发机制。</p>
+<h2 id="0x1-channel数据结构"><a href="#0x1-channel数据结构" class="headerlink" title="0x1.channel数据结构"></a>0x1.channel数据结构</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> hchan <span class="keyword">struct</span> &#123;</span><br><span class="line">	qcount   <span class="keyword">uint</span>           <span class="comment">// total data in the queue //循环队列元素个数</span></span><br><span class="line">	dataqsiz <span class="keyword">uint</span>           <span class="comment">// size of the circular queue //循环队列大小</span></span><br><span class="line">	buf      unsafe.Pointer <span class="comment">// points to an array of dataqsiz elements //循环队列指针</span></span><br><span class="line">	elemsize <span class="keyword">uint16</span> <span class="comment">//chan元素大小</span></span><br><span class="line">	closed   <span class="keyword">uint32</span> <span class="comment">//是否已经关闭</span></span><br><span class="line">	elemtype *_type <span class="comment">// element type //chan元素类型</span></span><br><span class="line">	sendx    <span class="keyword">uint</span>   <span class="comment">// send index //chan发送操作处理到的位置</span></span><br><span class="line">	recvx    <span class="keyword">uint</span>   <span class="comment">// receive index //chan接收操作处理到的位置</span></span><br><span class="line">	recvq    waitq  <span class="comment">// list of recv waiters //等待接收数据的goroutine列表</span></span><br><span class="line">	sendq    waitq  <span class="comment">// list of send waiters //等待发送数据的goroutine列表</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// lock protects all fields in hchan, as well as several</span></span><br><span class="line">	<span class="comment">// fields in sudogs blocked on this channel.</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// Do not change another G&#x27;s status while holding this lock</span></span><br><span class="line">	<span class="comment">// (in particular, do not ready a G), as this can deadlock</span></span><br><span class="line">	<span class="comment">// with stack shrinking.</span></span><br><span class="line">	lock mutex</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>buf</code>字段只有在缓冲型的channel才有，指向底层的循环数组。</p>
+<p><code>sendx</code>和<code>recvx</code>分别表示已发送和已接收的元素在循环数组中的索引。</p>
+<p><code>sendq</code>和<code>recvq</code>分别表示等待接收和等待发送的goroutine队列。这些goroutine由于尝试读取channel或者向channel发送数据而被阻塞。</p>
+<p><code>lock</code>用来保护hchan中所有的字段。保证每个channel的读写都是原子的。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// sudog 双向列表，sudog实际上是对goroutine的一个封装。</span></span><br><span class="line"><span class="keyword">type</span> waitq <span class="keyword">struct</span> &#123;</span><br><span class="line">	first *sudog</span><br><span class="line">	last  *sudog</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"> ┌─────┐</span><br><span class="line"> │hchan│</span><br><span class="line"> ├─────┴────────────┐</span><br><span class="line">5│   qcount uint    │</span><br><span class="line"> ├──────────────────┤</span><br><span class="line">8│  dataqsiz uint   │                 0   1   2   3   4   5   6   7</span><br><span class="line"> ├──────────────────┤               ┌───┬───┬───┬───┬───┬───┬───┬───┐</span><br><span class="line"> │buf unsafe.Pointer├──────────────►│ a │ b │ c │ d │ e │   │   │   │</span><br><span class="line"> ├──────────────────┤               └───┴───┴───┴───┴───┴───┴───┴───┘</span><br><span class="line"> │ elemsize uint16  │                 ▲                   ▲</span><br><span class="line"> ├──────────────────┤                 │                   │</span><br><span class="line"> │  closed uint32   │                 │                   │</span><br><span class="line"> ├──────────────────┤                 │                   │</span><br><span class="line"> │  elemtype *_type │                 │                   │</span><br><span class="line"> ├──────────────────┤                 │                   │</span><br><span class="line">0│    sendx uint    ├─────────────────┘                   │</span><br><span class="line"> ├──────────────────┤                                     │</span><br><span class="line">5│    recvx uint    ├─────────────────────────────────────┘</span><br><span class="line"> ├──────────────────┤</span><br><span class="line"> │    recvq waitq   ├─────────┬───────────────────────────────────────────┐</span><br><span class="line"> ├──────────────────┤         │                                           │</span><br><span class="line"> │    sendq waitq   ├─────┐   │   ┌───────┐     ┌───────┐     ┌───────┐   │</span><br><span class="line"> ├──────────────────┤     │   └──►│ sudog │◄───►│ sudog │◄───►│ sudog │◄──┘</span><br><span class="line"> │    lock mutex    │     │       └───────┘     └───────┘     └───────┘</span><br><span class="line"> └──────────────────┘     │</span><br><span class="line">                          │</span><br><span class="line">                          │       ┌───────┐     ┌───────┐     ┌───────┐</span><br><span class="line">                          │   ┌──►│ sudog │◄───►│ sudog │◄───►│ sudog │◄──┐</span><br><span class="line">                          │   │   └───────┘     └───────┘     └───────┘   │</span><br><span class="line">                          │   │                                           │</span><br><span class="line">                          └───┴───────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="0x2-创建channel"><a href="#0x2-创建channel" class="headerlink" title="0x2.创建channel"></a>0x2.创建channel</h2><p>创建<code>chan</code>一般使用<code>make</code>关键字。其中<code>chan</code>的类型分为有无缓冲两种模式。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>) <span class="comment">//无缓冲</span></span><br><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">2</span>) <span class="comment">//有缓冲</span></span><br></pre></td></tr></table></figure>
+
+<p>翻翻源码，有些看不太明白，只能是能看多少看多少了😭。在runtime/chan.go中都是使用<code>makechan</code>来创建<code>chan</code>。中文是个人注释，英文是官方注释。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	maxAlign  = <span class="number">8</span></span><br><span class="line">	hchanSize = unsafe.Sizeof(hchan&#123;&#125;) + <span class="keyword">uintptr</span>(-<span class="keyword">int</span>(unsafe.Sizeof(hchan&#123;&#125;))&amp;(maxAlign<span class="number">-1</span>)) <span class="comment">//hchan结构体大小</span></span><br><span class="line">	debugChan = <span class="literal">false</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">makechan64</span><span class="params">(t *chantype, size <span class="keyword">int64</span>)</span> *<span class="title">hchan</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">int64</span>(<span class="keyword">int</span>(size)) != size &#123;</span><br><span class="line">		<span class="built_in">panic</span>(plainError(<span class="string">&quot;makechan: size out of range&quot;</span>))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> makechan(t, <span class="keyword">int</span>(size))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">makechan</span><span class="params">(t *chantype, size <span class="keyword">int</span>)</span> *<span class="title">hchan</span></span> &#123;</span><br><span class="line">	elem := t.elem</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 检查channel size和align</span></span><br><span class="line">	<span class="comment">// compiler checks this but be safe.</span></span><br><span class="line">	<span class="keyword">if</span> elem.size &gt;= <span class="number">1</span>&lt;&lt;<span class="number">16</span> &#123;</span><br><span class="line">		throw(<span class="string">&quot;makechan: invalid channel element type&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> hchanSize%maxAlign != <span class="number">0</span> || elem.align &gt; maxAlign &#123;</span><br><span class="line">		throw(<span class="string">&quot;makechan: bad alignment&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 元素大小*个数，计算buf需要的内存大小</span></span><br><span class="line">	mem, overflow := math.MulUintptr(elem.size, <span class="keyword">uintptr</span>(size))</span><br><span class="line">	<span class="keyword">if</span> overflow || mem &gt; maxAlloc-hchanSize || size &lt; <span class="number">0</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(plainError(<span class="string">&quot;makechan: size out of range&quot;</span>))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Hchan does not contain pointers interesting for GC when elements stored in buf do not contain pointers.</span></span><br><span class="line">	<span class="comment">// buf points into the same allocation, elemtype is persistent.</span></span><br><span class="line">	<span class="comment">// SudoG&#x27;s are referenced from their owning thread so they can&#x27;t be collected.</span></span><br><span class="line">	<span class="comment">// TODO(dvyukov,rlh): Rethink when collector can move allocated objects.</span></span><br><span class="line">	<span class="keyword">var</span> c *hchan</span><br><span class="line">	<span class="keyword">switch</span> &#123;</span><br><span class="line">  <span class="comment">// 表示元素大小为零或者缓冲区大小为0（无缓冲类型），不需要创建buf。只进行一次内存分配。分配内存的大小就是hchan结构体大小。</span></span><br><span class="line">	<span class="keyword">case</span> mem == <span class="number">0</span>:</span><br><span class="line">		<span class="comment">// Queue or element size is zero.</span></span><br><span class="line">		c = (*hchan)(mallocgc(hchanSize, <span class="literal">nil</span>, <span class="literal">true</span>))</span><br><span class="line">		<span class="comment">// Race detector uses this location for synchronization.</span></span><br><span class="line">		c.buf = c.raceaddr()</span><br><span class="line">    </span><br><span class="line">  <span class="comment">// 元素类型不含指针，进行一次内存分配，分配一块连续的内存，大小是“hchan结构体大小+个数*元素大小”。</span></span><br><span class="line">  <span class="comment">// 同时元素大小不等于0且是缓冲区大小不为0</span></span><br><span class="line">	<span class="keyword">case</span> elem.ptrdata == <span class="number">0</span>:</span><br><span class="line">		<span class="comment">// Elements do not contain pointers.</span></span><br><span class="line">		<span class="comment">// Allocate hchan and buf in one call.</span></span><br><span class="line">		c = (*hchan)(mallocgc(hchanSize+mem, <span class="literal">nil</span>, <span class="literal">true</span>))</span><br><span class="line">		c.buf = add(unsafe.Pointer(c), hchanSize)</span><br><span class="line">    </span><br><span class="line">  <span class="comment">// 元素包含指针，缓冲区大小不为0，进行两次内存分配，单独为hchan和buf分配内存。</span></span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		<span class="comment">// Elements contain pointers.</span></span><br><span class="line">		c = <span class="built_in">new</span>(hchan)</span><br><span class="line">		c.buf = mallocgc(mem, elem, <span class="literal">true</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	c.elemsize = <span class="keyword">uint16</span>(elem.size)</span><br><span class="line">	c.elemtype = elem</span><br><span class="line">	c.dataqsiz = <span class="keyword">uint</span>(size)</span><br><span class="line">	lockInit(&amp;c.lock, lockRankHchan)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> debugChan &#123;</span><br><span class="line">		<span class="built_in">print</span>(<span class="string">&quot;makechan: chan=&quot;</span>, c, <span class="string">&quot;; elemsize=&quot;</span>, elem.size, <span class="string">&quot;; dataqsiz=&quot;</span>, size, <span class="string">&quot;\n&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> c</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据channel中收发的元素类型和缓冲区的大小，初始化hchan时有以下三种情况：</p>
+<ul>
+<li>元素大小为零或者缓冲区大小为0（无缓冲类型），不需要创建buf。进行一次内存分配。分配内存的大小就是hchan结构体大小。</li>
+<li>元素大小和缓冲区大小均不为0，且元素类型不含指针。进行一次内存分配，分配一块连续的内存，大小是“hchan结构体大小+个数*元素大小”。</li>
+<li>元素包含指针，缓冲区大小不为0。进行两次内存分配，单独为hchan和buf分配内存。</li>
+</ul>
+<h2 id="0x3-channel的基本应用"><a href="#0x3-channel的基本应用" class="headerlink" title="0x3.channel的基本应用"></a>0x3.channel的基本应用</h2><h3 id="1-超时处理"><a href="#1-超时处理" class="headerlink" title="1).超时处理"></a>1).超时处理</h3><p><code>res := &lt;- c1</code> 等待结果，<code>&lt;-time.After</code> 等待超时（1秒钟）以后发送的值。 由于 <code>select</code> 默认处理第一个已准备好的接收操作， 因此如果操作耗时超过了允许的 1 秒的话，将会执行超时 <code>case</code>。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">    c1 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        time.Sleep(<span class="number">2</span> * time.Second)</span><br><span class="line">        c1 &lt;- <span class="string">&quot;result 1&quot;</span></span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> res := &lt;-c1:</span><br><span class="line">        fmt.Println(res)</span><br><span class="line">    <span class="keyword">case</span> &lt;-time.After(<span class="number">1</span> * time.Second):</span><br><span class="line">        fmt.Println(<span class="string">&quot;timeout 1&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    c2 := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        time.Sleep(<span class="number">2</span> * time.Second)</span><br><span class="line">        c2 &lt;- <span class="string">&quot;result 2&quot;</span></span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="keyword">case</span> res := &lt;-c2:</span><br><span class="line">        fmt.Println(res)</span><br><span class="line">    <span class="keyword">case</span> &lt;-time.After(<span class="number">3</span> * time.Second):</span><br><span class="line">        fmt.Println(<span class="string">&quot;timeout 2&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">timeout 1</span><br><span class="line">result 2</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h3 id="2-控制并发"><a href="#2-控制并发" class="headerlink" title="2).控制并发"></a>2).控制并发</h3><p>构建一个缓冲型的 channel，容量为 3。接着遍历任务列表，每个任务启动一个 goroutine 去完成。真正执行任务，访问第三方的动作在 w() 中完成，在执行 w() 之前，先要从 limit 中拿“许可证”，拿到许可证之后，才能执行 w()，并且在执行完任务，要将“许可证”归还。这样就可以控制同时运行的 goroutine 数。如果 w() 发生 panic，那“许可证”可能就还不回去了，因此需要使用 defer 来保证。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> limit = <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">   <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">for</span> _, w := <span class="keyword">range</span> work &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">            limit &lt;- <span class="number">1</span></span><br><span class="line">            w()</span><br><span class="line">            &lt;-limit</span><br><span class="line">        &#125;()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-生产者消费者模型"><a href="#3-生产者消费者模型" class="headerlink" title="3).生产者消费者模型"></a>3).生产者消费者模型</h3><p>并发编程中最常见的例子就是生产者消费者模式，该模式主要通过平衡生产线程和消费线程的工作能力来提高程序的整体处理数据的速度。简单地说，就是生产者生产一些数据，然后放到成果队列中，同时消费者从成果队列中来取这些数据。这样就让生产消费变成了异步的两个过程。当成果队列中没有数据时，消费者就进入饥饿的等待中；而当成果队列中数据已满时，生产者则面临因产品挤压导致 CPU 被剥夺的下岗问题。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 生产者: 生成 factor 整数倍的序列</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Producer</span><span class="params">(factor <span class="keyword">int</span>, out <span class="keyword">chan</span>&lt;- <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; ; i++ &#123;</span><br><span class="line">        out &lt;- i*factor</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费者</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Consumer</span><span class="params">(in &lt;-<span class="keyword">chan</span> <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> v := <span class="keyword">range</span> in &#123;</span><br><span class="line">        fmt.Println(v)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">64</span>) <span class="comment">// 成果队列</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">go</span> Producer(<span class="number">3</span>, ch) <span class="comment">// 生成 3 的倍数的序列</span></span><br><span class="line">    <span class="keyword">go</span> Producer(<span class="number">5</span>, ch) <span class="comment">// 生成 5 的倍数的序列</span></span><br><span class="line">    <span class="keyword">go</span> Consumer(ch)    <span class="comment">// 消费生成的队列</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Ctrl+C 退出</span></span><br><span class="line">    sig := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal, <span class="number">1</span>)</span><br><span class="line">    signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;quit (%v)\n&quot;</span>, &lt;-sig)</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/channel/" rel="tag"># channel</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/30/Go_Interface_2/" rel="prev" title="Go Interface理解(2)">
+      <i class="fa fa-chevron-left"></i> Go Interface理解(2)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/11/02/Go_Channel_Close/" rel="next" title="Go Channel关闭方式">
+      Go Channel关闭方式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  Copyright&copy; 2020–
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Egan Dong</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

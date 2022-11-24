@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="channel的关闭是比较头疼的，搞不好就panic。直接panic-recover要被喷莽夫，不优雅。所以找了很多资料，总结一下channel的关闭过程，常见的关闭方式和优雅的关闭方式（没有人会比福杰一家还要优雅）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go Channel关闭方式">
+<meta property="og:url" content="https://blog.eganx.cn/2022/11/02/Go_Channel_Close/index.html">
+<meta property="og:site_name" content="Egan&#39;s Blog">
+<meta property="og:description" content="channel的关闭是比较头疼的，搞不好就panic。直接panic-recover要被喷莽夫，不优雅。所以找了很多资料，总结一下channel的关闭过程，常见的关闭方式和优雅的关闭方式（没有人会比福杰一家还要优雅）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-02T15:56:54.000Z">
+<meta property="article:modified_time" content="2022-11-24T07:06:51.771Z">
+<meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="channel">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.eganx.cn/2022/11/02/Go_Channel_Close/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Go Channel关闭方式 | Egan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Egan's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <h1 class="site-title">Egan's Blog</h1>
+    </a>
+      <p class="site-subtitle" itemprop="description">The winter is coming</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+				<!-- Matomo -->
+				<script>
+						var _paq = window._paq = window._paq || [];
+						/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+					  _paq.push(['trackPageView']);
+					  _paq.push(['enableLinkTracking']);
+					  (function() {
+							 var u="https://matomo.eganx.cn:7003/matomo/";
+							 _paq.push(['setTrackerUrl', u+'matomo.php']);
+							 _paq.push(['setSiteId', '1']);
+							 var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+							 g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+					 })();
+			 </script>
+			 <!-- End Matomo Code -->
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/02/Go_Channel_Close/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go Channel关闭方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-02 23:56:54" itemprop="dateCreated datePublished" datetime="2022-11-02T23:56:54+08:00">2022-11-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>channel的关闭是比较头疼的，搞不好就panic。直接panic-recover要被喷莽夫，不优雅。所以找了很多资料，总结一下channel的关闭过程，常见的关闭方式和优雅的关闭方式（<strong>没有人会比福杰一家还要优雅</strong>）</p>
+<span id="more"></span>
+
+<h2 id="0x0-关闭chan过程"><a href="#0x0-关闭chan过程" class="headerlink" title="0x0.关闭chan过程"></a>0x0.关闭chan过程</h2><p>关闭channel的执行函数是<code>closechan</code>，源码如下</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// go version: go1.18.2</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">closechan</span><span class="params">(c *hchan)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 关闭一个nil channel，直接panic。</span></span><br><span class="line">  <span class="keyword">if</span> c == <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(plainError(<span class="string">&quot;close of nil channel&quot;</span>))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 锁</span></span><br><span class="line">	lock(&amp;c.lock)</span><br><span class="line">  <span class="comment">// channel已经关闭</span></span><br><span class="line">	<span class="keyword">if</span> c.closed != <span class="number">0</span> &#123;</span><br><span class="line">		<span class="comment">// 解锁，然后panic</span></span><br><span class="line">    unlock(&amp;c.lock)</span><br><span class="line">		<span class="built_in">panic</span>(plainError(<span class="string">&quot;close of closed channel&quot;</span>))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> raceenabled &#123;</span><br><span class="line">		callerpc := getcallerpc()</span><br><span class="line">		racewritepc(c.raceaddr(), callerpc, abi.FuncPCABIInternal(closechan))</span><br><span class="line">		racerelease(c.raceaddr())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 设置chan已关闭</span></span><br><span class="line">	c.closed = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> glist gList</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 释放channel里所有等待接收队列里的sudog</span></span><br><span class="line">	<span class="comment">// release all readers</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		sg := c.recvq.dequeue()</span><br><span class="line">		<span class="keyword">if</span> sg == <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">    <span class="comment">// elem不为空，还想要接收数据，给个相对应类型的零值。</span></span><br><span class="line">		<span class="keyword">if</span> sg.elem != <span class="literal">nil</span> &#123;</span><br><span class="line">			typedmemclr(c.elemtype, sg.elem)</span><br><span class="line">			sg.elem = <span class="literal">nil</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> sg.releasetime != <span class="number">0</span> &#123;</span><br><span class="line">			sg.releasetime = cputicks()</span><br><span class="line">		&#125;</span><br><span class="line">    <span class="comment">// 取出goroutine</span></span><br><span class="line">		gp := sg.g</span><br><span class="line">		gp.param = unsafe.Pointer(sg)</span><br><span class="line">		sg.success = <span class="literal">false</span></span><br><span class="line">		<span class="keyword">if</span> raceenabled &#123;</span><br><span class="line">			raceacquireg(gp, c.raceaddr())</span><br><span class="line">		&#125;</span><br><span class="line">		glist.push(gp)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 释放channel里所有等待发送队列里的sudog，同时这些goroutine将会panic。</span></span><br><span class="line">	<span class="comment">// release all writers (they will panic)</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		sg := c.sendq.dequeue()</span><br><span class="line">		<span class="keyword">if</span> sg == <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		&#125;</span><br><span class="line">		sg.elem = <span class="literal">nil</span></span><br><span class="line">		<span class="keyword">if</span> sg.releasetime != <span class="number">0</span> &#123;</span><br><span class="line">			sg.releasetime = cputicks()</span><br><span class="line">		&#125;</span><br><span class="line">		gp := sg.g</span><br><span class="line">		gp.param = unsafe.Pointer(sg)</span><br><span class="line">		sg.success = <span class="literal">false</span></span><br><span class="line">		<span class="keyword">if</span> raceenabled &#123;</span><br><span class="line">			raceacquireg(gp, c.raceaddr())</span><br><span class="line">		&#125;</span><br><span class="line">		glist.push(gp)</span><br><span class="line">	&#125;</span><br><span class="line">	unlock(&amp;c.lock)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Ready all Gs now that we&#x27;ve dropped the channel lock.</span></span><br><span class="line">  <span class="comment">// 遍历glist，唤醒goroutine</span></span><br><span class="line">	<span class="keyword">for</span> !glist.empty() &#123;</span><br><span class="line">		gp := glist.pop()</span><br><span class="line">		gp.schedlink = <span class="number">0</span></span><br><span class="line">		goready(gp, <span class="number">3</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将<code>recvq</code>和<code>sendq</code>两个队列中的Goroutine加入到gList中，并清除掉所有sudog上未被处理掉元素。最后将glist中所有的goroutine加到调度队列，等待被唤醒。</p>
+<blockquote>
+<p><font color=red>发送者在被唤醒之后会panic。</font></p>
+</blockquote>
+<p>总结一下:</p>
+<table>
+<thead>
+<tr>
+<th align="center">操作</th>
+<th align="center">closed channel</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">关闭(close)</td>
+<td align="center">panic</td>
+</tr>
+<tr>
+<td align="center">发送(c&lt;-)</td>
+<td align="center">panic</td>
+</tr>
+<tr>
+<td align="center">接收(&lt;-c)</td>
+<td align="center">永远不阻塞</td>
+</tr>
+</tbody></table>
+<h2 id="0x1-关闭channel的常见方式"><a href="#0x1-关闭channel的常见方式" class="headerlink" title="0x1.关闭channel的常见方式"></a>0x1.关闭channel的常见方式</h2><p>channel的关闭与否都有可能造成panic。如何获取channel是否关闭和如何稳妥的关闭channel是非常重要的事情‼️</p>
+<ul>
+<li>在不改变channel自身状态的情况下，无法获知一个channel是否关闭。</li>
+<li>关闭一个closed channel会导致panic。所以在关闭channel的时候，关闭的一方在不清楚当前channel是否关闭的情况下去关闭channel是很危险的⚠️。</li>
+<li>向一个closed channel发送数据会导致panic。同上，在发送方不知道channel是否关闭的情况下向channel发送数据，也是很危险的⚠️</li>
+</ul>
+<p>关闭channel原则：</p>
+<blockquote>
+<p>一般原则上使用channel是不允许接收方关闭channel和 <strong>不能关闭一个有多个并发发送者的channel</strong>。 换而言之， 你只能在发送方的 goroutine 中关闭只有该发送方的channel。</p>
+</blockquote>
+<h3 id="1-defer-recover粗暴关闭channel"><a href="#1-defer-recover粗暴关闭channel" class="headerlink" title="1).defer-recover粗暴关闭channel"></a>1).<strong>defer-recover粗暴关闭channel</strong></h3><p>使用defer-recover机制来确保程序不会因panic而崩溃，然后直接关闭chan。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SafeClose</span><span class="params">(ch <span class="keyword">chan</span> T)</span> <span class="params">(justClosed <span class="keyword">bool</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">recover</span>() != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="comment">// 返回值可以被修改</span></span><br><span class="line">            <span class="comment">// 在一个延时函数的调用中。</span></span><br><span class="line">            justClosed = <span class="literal">false</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 假设这里 ch != nil 。</span></span><br><span class="line">    <span class="built_in">close</span>(ch)   <span class="comment">// 如果 ch 已经被关闭将会引发 panic</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span> <span class="comment">// &lt;=&gt; justClosed = true; return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样的思想也可以用在发送方，确保向closed channel发送数据不会造成程序崩了。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">SafeSend</span><span class="params">(ch <span class="keyword">chan</span> T, value T)</span> <span class="params">(closed <span class="keyword">bool</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">recover</span>() != <span class="literal">nil</span> &#123;</span><br><span class="line">            closed = <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    ch &lt;- value  <span class="comment">// 如果 ch 已经被关闭将会引发 panic</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span> <span class="comment">// &lt;=&gt; closed = false; return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的方法虽然处理了panic，但是并没有避免panic的发生。</p>
+<h3 id="2-使用sync-Once关闭channel"><a href="#2-使用sync-Once关闭channel" class="headerlink" title="2).使用sync.Once关闭channel"></a>2).<strong>使用sync.Once关闭channel</strong></h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> MyChannel <span class="keyword">struct</span> &#123;</span><br><span class="line">    C    <span class="keyword">chan</span> T</span><br><span class="line">    once sync.Once</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewMyChannel</span><span class="params">()</span> *<span class="title">MyChannel</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;MyChannel&#123;C: <span class="built_in">make</span>(<span class="keyword">chan</span> T)&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mc *MyChannel)</span> <span class="title">SafeClose</span><span class="params">()</span></span> &#123;</span><br><span class="line">    mc.once.Do(<span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="built_in">close</span>(mc.C)</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-使用sync-Mutex避免多次关闭同一个channel"><a href="#3-使用sync-Mutex避免多次关闭同一个channel" class="headerlink" title="3).使用sync.Mutex避免多次关闭同一个channel"></a>3).<strong>使用sync.Mutex避免多次关闭同一个channel</strong></h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> MyChannel <span class="keyword">struct</span> &#123;</span><br><span class="line">    C      <span class="keyword">chan</span> T</span><br><span class="line">    closed <span class="keyword">bool</span></span><br><span class="line">    mutex  sync.Mutex</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewMyChannel</span><span class="params">()</span> *<span class="title">MyChannel</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;MyChannel&#123;C: <span class="built_in">make</span>(<span class="keyword">chan</span> T)&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mc *MyChannel)</span> <span class="title">SafeClose</span><span class="params">()</span></span> &#123;</span><br><span class="line">    mc.mutex.Lock()</span><br><span class="line">    <span class="keyword">defer</span> mc.mutex.Unlock()</span><br><span class="line">    <span class="keyword">if</span> !mc.closed &#123;</span><br><span class="line">        <span class="built_in">close</span>(mc.C)</span><br><span class="line">        mc.closed = <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mc *MyChannel)</span> <span class="title">IsClosed</span><span class="params">()</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">    mc.mutex.Lock()</span><br><span class="line">    <span class="keyword">defer</span> mc.mutex.Unlock()</span><br><span class="line">    <span class="keyword">return</span> mc.closed</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="0x2-优雅的关闭channel"><a href="#0x2-优雅的关闭channel" class="headerlink" title="0x2.优雅的关闭channel"></a>0x2.优雅的关闭channel</h2><p>上面的几种关闭channel的方式，用的人应该不少(说实话，我也很喜欢使用<code>sync.Once</code>的方式去关闭channel)。但是，有许多人认为代码在考虑业务实现的同时，应该优雅优雅再优雅！（舍监表示很开心！阿尼亚表示很难受！）</p>
+<p>那么如何优雅的关闭channel？按照发送者和接收者的数量可以分为以下四种：</p>
+<blockquote>
+<p><font color = ligblue>1. 一个 sender，一个 receiver</font><br><font color = ligblue>2. 一个 sender， N个 receiver</font><br><font color = ligblue>3. M个 sender， 一个 receiver</font><br><font color = ligblue>4. M个 sender， N个 receiver</font></p>
+</blockquote>
+<h3 id="1-只有一个发送者，关闭唯一的发送者"><a href="#1-只有一个发送者，关闭唯一的发送者" class="headerlink" title="1).只有一个发送者，关闭唯一的发送者"></a>1).只有一个发送者，关闭唯一的发送者</h3><p>第一种和第二种情况比较好处理，因为只有一个发送者，只需要关闭唯一的发送者就可以。<code>sync.WaitGroup</code> 会被用于完成例子。 它在实践中并不是必要的。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">    <span class="string">&quot;math/rand&quot;</span></span><br><span class="line">    <span class="string">&quot;sync&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    rand.Seed(time.Now().UnixNano())</span><br><span class="line">    log.SetFlags(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> MaxRandomNumber = <span class="number">100000</span></span><br><span class="line">    <span class="keyword">const</span> NumReceivers = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">    wgReceivers := sync.WaitGroup&#123;&#125;</span><br><span class="line">    wgReceivers.Add(NumReceivers)</span><br><span class="line"></span><br><span class="line">    dataCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送者</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">for</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> value := rand.Intn(MaxRandomNumber); value == <span class="number">0</span> &#123;</span><br><span class="line">                <span class="comment">// 唯一的发送者可以安全地关闭通道。</span></span><br><span class="line">                <span class="built_in">close</span>(dataCh)</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;            </span><br><span class="line">                dataCh &lt;- value</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收者</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; NumReceivers; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">            <span class="keyword">defer</span> wgReceivers.Done()</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 接收数据直到 dataCh 被关闭或者</span></span><br><span class="line">            <span class="comment">// dataCh 的数据缓存队列是空的。</span></span><br><span class="line">            <span class="keyword">for</span> value := <span class="keyword">range</span> dataCh &#123;</span><br><span class="line">                log.Println(value)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    wgReceivers.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-多个发送者，一个接收者。"><a href="#2-多个发送者，一个接收者。" class="headerlink" title="2).多个发送者，一个接收者。"></a>2).多个发送者，一个接收者。</h3><p>接收者通过关闭一个channel，告诉发送者不要再发了。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">    <span class="string">&quot;math/rand&quot;</span></span><br><span class="line">    <span class="string">&quot;sync&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    rand.Seed(time.Now().UnixNano())</span><br><span class="line">    log.SetFlags(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">const</span> MaxRandomNumber = <span class="number">100000</span></span><br><span class="line">    <span class="keyword">const</span> NumSenders = <span class="number">1000</span></span><br><span class="line"></span><br><span class="line">    wgReceivers := sync.WaitGroup&#123;&#125;</span><br><span class="line">    wgReceivers.Add(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    dataCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">100</span>)</span><br><span class="line">    stopCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</span><br><span class="line">        <span class="comment">// stopCh 是一个信号通道。</span></span><br><span class="line">        <span class="comment">// 它的发送者是 dataCh 的接收者。</span></span><br><span class="line">        <span class="comment">// 它的接收者是 dataCh 的发送者。</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送者</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; NumSenders; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">            <span class="keyword">for</span> &#123;</span><br><span class="line">                <span class="keyword">select</span> &#123;</span><br><span class="line">                <span class="keyword">case</span> &lt;- stopCh:</span><br><span class="line">                    <span class="keyword">return</span></span><br><span class="line">                <span class="keyword">case</span> dataCh &lt;- rand.Intn(MaxRandomNumber):</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;()</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收者</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">defer</span> wgReceivers.Done()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> value := <span class="keyword">range</span> dataCh &#123;</span><br><span class="line">            <span class="keyword">if</span> value == MaxRandomNumber<span class="number">-1</span> &#123;</span><br><span class="line">                <span class="comment">// dataCh 通道的接收者也是 stopCh 通道的发送者。</span></span><br><span class="line">                <span class="comment">// 在这里关闭停止通道是安全的。.</span></span><br><span class="line">                <span class="built_in">close</span>(stopCh)</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            log.Println(value)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    wgReceivers.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-多个发送者，多个接收者。"><a href="#3-多个发送者，多个接收者。" class="headerlink" title="3).多个发送者，多个接收者。"></a>3).多个发送者，多个接收者。</h3><p>当发送者和接收者都是多个的时候，没办法通过任何一方去终止这场游戏。因此需要增加一个中间人的角色来处理。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;time&quot;</span></span><br><span class="line">    <span class="string">&quot;math/rand&quot;</span></span><br><span class="line">    <span class="string">&quot;sync&quot;</span></span><br><span class="line">    <span class="string">&quot;log&quot;</span></span><br><span class="line">    <span class="string">&quot;strconv&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    rand.Seed(time.Now().UnixNano())</span><br><span class="line">    log.SetFlags(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">const</span> MaxRandomNumber = <span class="number">100000</span></span><br><span class="line">    <span class="keyword">const</span> NumReceivers = <span class="number">100</span></span><br><span class="line">    <span class="keyword">const</span> NumSenders = <span class="number">1000</span></span><br><span class="line"></span><br><span class="line">    wgReceivers := sync.WaitGroup&#123;&#125;</span><br><span class="line">    wgReceivers.Add(NumReceivers)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    dataCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">100</span>)</span><br><span class="line">    stopCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</span><br><span class="line">        <span class="comment">// stopCh 是一个信号通道。</span></span><br><span class="line">        <span class="comment">// 它的发送者是下面的主持人 goroutine。</span></span><br><span class="line">        <span class="comment">// 它的接收者是 dataCh的所有发送者和接收者。</span></span><br><span class="line">    toStop := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>, <span class="number">1</span>)</span><br><span class="line">        <span class="comment">// toStop 通道通常用来通知主持人去关闭信号通道( stopCh )。</span></span><br><span class="line">        <span class="comment">// 它的发送者是 dataCh的任意发送者和接收者。</span></span><br><span class="line">        <span class="comment">// 它的接收者是下面的主持人 goroutine</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> stoppedBy <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 主持人</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        stoppedBy = &lt;-toStop</span><br><span class="line">        <span class="built_in">close</span>(stopCh)</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送者</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; NumSenders; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(id <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">for</span> &#123;</span><br><span class="line">                value := rand.Intn(MaxRandomNumber)</span><br><span class="line">                <span class="keyword">if</span> value == <span class="number">0</span> &#123;</span><br><span class="line">                    <span class="comment">// 用于通知主持人关闭信号通道。</span></span><br><span class="line">                    <span class="keyword">select</span> &#123;</span><br><span class="line">                    <span class="keyword">case</span> toStop &lt;- <span class="string">&quot;sender#&quot;</span> + id:</span><br><span class="line">                    <span class="keyword">default</span>:</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">return</span></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">select</span> &#123;</span><br><span class="line">                <span class="keyword">case</span> &lt;- stopCh:</span><br><span class="line">                    <span class="keyword">return</span></span><br><span class="line">                <span class="keyword">case</span> dataCh &lt;- value:</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;(strconv.Itoa(i))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接收者</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; NumReceivers; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(id <span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">defer</span> wgReceivers.Done()</span><br><span class="line">            <span class="keyword">for</span> &#123;</span><br><span class="line">                <span class="keyword">select</span> &#123;</span><br><span class="line">                <span class="keyword">case</span> &lt;- stopCh:</span><br><span class="line">                    <span class="keyword">return</span></span><br><span class="line">                <span class="keyword">case</span> value := &lt;-dataCh:</span><br><span class="line">                    <span class="keyword">if</span> value == MaxRandomNumber<span class="number">-1</span> &#123;</span><br><span class="line">                        <span class="comment">// 同样用于通知主持人去关闭信号通道。</span></span><br><span class="line">                        <span class="keyword">select</span> &#123;</span><br><span class="line">                        <span class="keyword">case</span> toStop &lt;- <span class="string">&quot;receiver#&quot;</span> + id:</span><br><span class="line">                        <span class="keyword">default</span>:</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">return</span></span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    log.Println(value)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;(strconv.Itoa(i))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    wgReceivers.Wait()</span><br><span class="line">    log.Println(<span class="string">&quot;stopped by&quot;</span>, stoppedBy)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时<code>toStop</code>通道的缓存大小是1。不使用非缓冲型channel是为了避免第一个关闭信号在主持人准备好从<code>toStop</code>接收数据之前发送，造成丢失。</p>
+<p>也可以设置<code>toStop</code>通道的buf为发送者和接收者数量之和。toStop的容量足够的时候，就不用担心阻塞了。也就不需要借助select语句了。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line">toStop := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">string</span>, NumReceivers + NumSenders)</span><br><span class="line">...</span><br><span class="line">            value := rand.Intn(MaxRandomNumber)</span><br><span class="line">            <span class="keyword">if</span> value == <span class="number">0</span> &#123;</span><br><span class="line">                toStop &lt;- <span class="string">&quot;sender#&quot;</span> + id</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            &#125;</span><br><span class="line">...</span><br><span class="line">                <span class="keyword">if</span> value == MaxRandomNumber<span class="number">-1</span> &#123;</span><br><span class="line">                    toStop &lt;- <span class="string">&quot;receiver#&quot;</span> + id</span><br><span class="line">                    <span class="keyword">return</span></span><br><span class="line">                &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+
+
+<p><font color = green>Q&amp;A: 关闭的channel还能读吗？</font></p>
+<blockquote>
+<p>可以。从一个带缓冲的chan里读取数据时，当channel被关闭，是可以读到有效值的。可以是comma-ok的方式读取chan数据，当ok值为false时，说明channel已经关闭且通道无数据，读出的数据开始无效。</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>, <span class="number">3</span>)</span><br><span class="line">	ch &lt;- <span class="number">0</span></span><br><span class="line">	ch &lt;- <span class="number">1</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">close</span>(ch)</span><br><span class="line">	x, ok := &lt;-ch</span><br><span class="line">	<span class="keyword">if</span> ok &#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;received: &quot;</span>, x)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	y, ok := &lt;-ch</span><br><span class="line">	<span class="keyword">if</span> ok &#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;received: &quot;</span>, y)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	z, ok := &lt;-ch</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		fmt.Println(<span class="string">&quot;received false &quot;</span>, z)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>运行结果：<br>received:  0<br>received:  1<br>received false:  0</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/channel/" rel="tag"># channel</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/01/Go_Channel_DS/" rel="prev" title="Go Channel数据结构和创建">
+      <i class="fa fa-chevron-left"></i> Go Channel数据结构和创建
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  Copyright&copy; 2020–
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Egan Dong</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
