@@ -6,7 +6,7 @@
   <link href="https://blog.eganx.cn/atom.xml" rel="self"/>
   
   <link href="https://blog.eganx.cn/"/>
-  <updated>2022-11-24T07:06:51.771Z</updated>
+  <updated>2022-12-05T10:54:58.287Z</updated>
   <id>https://blog.eganx.cn/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Go Context</title>
+    <link href="https://blog.eganx.cn/2022/11/04/Go_Context/"/>
+    <id>https://blog.eganx.cn/2022/11/04/Go_Context/</id>
+    <published>2022-11-04T03:45:19.000Z</published>
+    <updated>2022-12-05T10:54:58.287Z</updated>
+    
+    <content type="html"><![CDATA[<p>context是Go的一个标准库，中文一般叫做”上下文”。context主要是用来在goroutine之间传递上下午信息，包括取消信号、超时时间等。context.Context类型的值可以协调多个goroutine中的代码执行“取消”操作，并且可以存储键值对。而且还是并发安全的。与它协作可以在API的外部控制执行“取消”操作，比如取消一个HTTP请求的执行。</p><span id="more"></span><h2 id="0x0-context的作用"><a href="#0x0-context的作用" class="headerlink" title="0x0.context的作用"></a>0x0.context的作用</h2><p>在http server中，一个请求有可能会起若干个协程，这些goroutine有时候是需要共享请求的基本数据的，包括token，超时时间和取消信号等。当请求迟迟得不到回应或者此次请求被取消，可能是使用者关闭了浏览器或已经超过了请求方的超时时间，请求方直接放弃了这次请求的结果。这个时候，所有为这个请求工作的goroutine需要快速退出，因为工作成果变成了无意义的。在相关的goroutine退出后，系统可以回收相关资源。</p><p>正常关闭协程是采用<code>channel+select</code>方式来控制。但是当一个请求相关联的协程数量过多，且相互关联，能够同时关闭，可以使用context来实现。</p><blockquote><p><font color=ligblue>context用来解决goroutine之间退出通知、元数据传递的功能。    </font></p></blockquote><p>context的使用建议：</p><ul><li><p>不要将 Context 塞到结构体里。直接将 Context 类型作为函数的第一参数，而且一般都命名为 ctx。</p></li><li><p>不要向函数传入一个 nil 的 context，如果你实在不知道传什么，标准库给你准备好了一个 context：todo。</p></li><li><p>不要把本应该作为函数参数的类型塞到 context 中，context 存储的应该是一些共同的数据。例如：登陆的 session、cookie 等。</p></li><li><p>同一个 context 可能会被传递到多个 goroutine，别担心，context 是并发安全的。</p></li></ul><h3 id="1-传递共享的数据"><a href="#1-传递共享的数据" class="headerlink" title="1).传递共享的数据"></a>1).传递共享的数据</h3><p>对于web服务端开发，往往希望将一个请求处理的整个过程串起来，因此需要在函数调用的时候传递context。</p><p>context的常见创建函数：</p><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建空白的根节点context</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Background</span><span class="params">()</span> <span class="title">Context</span></span> </span><br><span class="line"><span class="comment">// 创建子节点context</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">WithCancel</span><span class="params">(parent Context)</span> <span class="params">(ctx Context, cancel CancelFunc)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">WithDeadline</span><span class="params">(parent Context, deadline time.Time)</span> <span class="params">(Context, CancelFunc)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">WithTimeout</span><span class="params">(parent Context, timeout time.Duration)</span> <span class="params">(Context, CancelFunc)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">WithValue</span><span class="params">(parent Context, key, val <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">Context</span></span></span><br></pre></td></tr></table></figure><h3 id="2-取消goroutine"><a href="#2-取消goroutine" class="headerlink" title="2).取消goroutine"></a>2).取消goroutine</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">func_eg</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        ... <span class="comment">// 业务代码：1秒刷新1次</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">select</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">            <span class="comment">// 被取消，直接返回</span></span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        <span class="keyword">case</span> &lt;-time.After(time.Second):</span><br><span class="line">            <span class="comment">// block 1 秒钟 </span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// main</span></span><br><span class="line">ctx, cancel := context.WithTimeout(context.Background(), time.Hour)</span><br><span class="line"><span class="keyword">go</span> func_eg(ctx)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 客户端取消时，调用cancel函数</span></span><br><span class="line">cancel()</span><br></pre></td></tr></table></figure><p><code>cancel()</code>函数返回的context和cancelFun是分开的。context本身是没有cancel函数，保证取消函数只能由外部调用，防止子节点context调用取消函数，从而严格控制信息流从父节点context流向子节点context。</p><h3 id="3-防止goroutine泄露"><a href="#3-防止goroutine泄露" class="headerlink" title="3).防止goroutine泄露"></a>3).防止goroutine泄露</h3><p>某些goroutine处于无限循环状态，若无外部取消函数，会造成系统资源泄露。</p><h2 id="0x1-context详细解析"><a href="#0x1-context详细解析" class="headerlink" title="0x1.context详细解析"></a>0x1.context详细解析</h2><table><thead><tr><th>类型</th><th>名称</th><th>作用</th></tr></thead><tbody><tr><td>Context</td><td>接口</td><td>定义了 Context 接口的四个方法</td></tr><tr><td>emptyCtx</td><td>结构体</td><td>实现了 Context 接口，它其实是个空的 context</td></tr><tr><td>CancelFunc</td><td>函数</td><td>取消函数</td></tr><tr><td>canceler</td><td>接口</td><td>context 取消接口，定义了两个方法</td></tr><tr><td>cancelCtx</td><td>结构体</td><td>可以被取消</td></tr><tr><td>timerCtx</td><td>结构体</td><td>超时会被取消</td></tr><tr><td>valueCtx</td><td>结构体</td><td>可以存储 k-v 对</td></tr><tr><td>Background</td><td>函数</td><td>返回一个空的 context，常作为根 context</td></tr><tr><td>TODO</td><td>函数</td><td>返回一个空的 context，常用于重构时期，没有合适的 context 可用</td></tr><tr><td>WithCancel</td><td>函数</td><td>基于父 context，生成一个可以取消的 context</td></tr><tr><td>newCancelCtx</td><td>函数</td><td>创建一个可取消的 context</td></tr><tr><td>propagateCancel</td><td>函数</td><td>向下传递 context 节点间的取消关系</td></tr><tr><td>parentCancelCtx</td><td>函数</td><td>找到第一个可取消的父节点</td></tr><tr><td>removeChild</td><td>函数</td><td>去掉父节点的孩子节点</td></tr><tr><td>init</td><td>函数</td><td>包初始化</td></tr><tr><td>WithDeadline</td><td>函数</td><td>创建一个有 deadline 的 context</td></tr><tr><td>WithTimeout</td><td>函数</td><td>创建一个有 timeout 的 context</td></tr><tr><td>WithValue</td><td>函数</td><td>创建一个存储 k-v 对的 context</td></tr></tbody></table>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;context是Go的一个标准库，中文一般叫做”上下文”。context主要是用来在goroutine之间传递上下午信息，包括取消信号、超时时间等。context.Context类型的值可以协调多个goroutine中的代码执行“取消”操作，并且可以存储键值对。而且还是并发安全的。与它协作可以在API的外部控制执行“取消”操作，比如取消一个HTTP请求的执行。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Golang" scheme="https://blog.eganx.cn/categories/Golang/"/>
+    
+    
+    <category term="go" scheme="https://blog.eganx.cn/tags/go/"/>
+    
+    <category term="context" scheme="https://blog.eganx.cn/tags/context/"/>
+    
+  </entry>
   
   <entry>
     <title>Go Channel关闭方式</title>

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.eganx.cn/2022/11/04/Go_Context/</loc>
+    <lastmod>2022-12-05</lastmod>
+  </url>
+  <url>
     <loc>https://blog.eganx.cn/2022/11/02/Go_Channel_Close/</loc>
     <lastmod>2022-11-24</lastmod>
   </url>
