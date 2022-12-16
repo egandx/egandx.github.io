@@ -6,7 +6,7 @@
   <link href="https://blog.eganx.cn/atom.xml" rel="self"/>
   
   <link href="https://blog.eganx.cn/"/>
-  <updated>2022-12-05T10:54:58.287Z</updated>
+  <updated>2022-12-16T02:16:06.630Z</updated>
   <id>https://blog.eganx.cn/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Studio 3T Free跳过一个月Full product的登陆试用(Windows)</title>
+    <link href="https://blog.eganx.cn/2022/11/05/Tool_Studio3t/"/>
+    <id>https://blog.eganx.cn/2022/11/05/Tool_Studio3t/</id>
+    <published>2022-11-05T14:32:12.000Z</published>
+    <updated>2022-12-16T02:16:06.630Z</updated>
+    
+    <content type="html"><![CDATA[<p>当Robo 3T变成了Studio 3T Free，不想试用Studio 3T的Full product。只想使用Robo 3T Free(Robo 3T)，该如何跳过一个月Full product的登陆试用呢？</p><span id="more"></span><h2 id="0x0-尊重付费软件"><a href="#0x0-尊重付费软件" class="headerlink" title="0x0.尊重付费软件"></a>0x0.尊重付费软件</h2><p>Robo 3T作为常用的MongoDB GUI，现在变成了Studio 3T Free。依旧是免费，但是在Windows下初次打开Studio 3T软件时，会要求必须登陆，然后开始一个月的Full product trial。这个就很烦，我就只想用免费版的，毕竟免费版就可以满足我的需求。体验试用是好事，但是当这件事成为必选项时，就会让人很不爽😕</p><p>所以在不进行非正规手段进行软件破解时，该如何进行跳过登陆激活进行免费版的使用呢？</p><p>找到位于<code>C:\Windows\System32\drivers\ect</code>下的<code>hosts</code>文件，将下面两行添加进去。</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1        update.studio3t.com</span><br><span class="line">127.0.0.1        license-portal-eb.studio3t.com</span><br></pre></td></tr></table></figure><p>然后重启Studio 3T时，Product activation弹窗就会跳过<code>Login/Register</code>这一步，直接到达<code>Finish</code>。Nice! 大功告成。</p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;当Robo 3T变成了Studio 3T Free，不想试用Studio 3T的Full product。只想使用Robo 3T Free(Robo 3T)，该如何跳过一个月Full product的登陆试用呢？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Tool" scheme="https://blog.eganx.cn/categories/Tool/"/>
+    
+    
+    <category term="tool" scheme="https://blog.eganx.cn/tags/tool/"/>
+    
+    <category term="studio3t" scheme="https://blog.eganx.cn/tags/studio3t/"/>
+    
+  </entry>
   
   <entry>
     <title>Go Context</title>
