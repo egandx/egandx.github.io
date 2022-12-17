@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.eganx.cn/2022/11/06/Win10_WSL_Docker/</loc>
+    <lastmod>2022-12-17</lastmod>
+  </url>
+  <url>
     <loc>https://blog.eganx.cn/2022/11/05/Tool_Studio3t/</loc>
     <lastmod>2022-12-16</lastmod>
   </url>
