@@ -228,13 +228,6 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/tags/GC/</loc>
-    <lastmod>2022-12-26</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/tags/go/</loc>
     <lastmod>2022-12-26</lastmod>
     <changefreq>daily</changefreq>
@@ -243,6 +236,13 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/channel/</loc>
+    <lastmod>2022-12-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/GC/</loc>
     <lastmod>2022-12-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -277,13 +277,6 @@
   </url>
   
   <url>
-    <loc>https://blog.eganx.cn/tags/slice/</loc>
-    <lastmod>2022-12-26</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://blog.eganx.cn/tags/make/</loc>
     <lastmod>2022-12-26</lastmod>
     <changefreq>daily</changefreq>
@@ -298,7 +291,28 @@
   </url>
   
   <url>
+    <loc>https://blog.eganx.cn/tags/slice/</loc>
+    <lastmod>2022-12-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.eganx.cn/tags/%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2/</loc>
+    <lastmod>2022-12-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/%E5%8D%8E%E4%B8%BAOD/</loc>
+    <lastmod>2022-12-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://blog.eganx.cn/tags/%E7%AC%94%E8%AF%95/</loc>
     <lastmod>2022-12-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -327,20 +341,6 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/mongo/</loc>
-    <lastmod>2022-12-26</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/%E5%8D%8E%E4%B8%BAOD/</loc>
-    <lastmod>2022-12-26</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/%E7%AC%94%E8%AF%95/</loc>
     <lastmod>2022-12-26</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
