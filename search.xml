@@ -4,6 +4,60 @@
   
     
     <entry>
+      <title>Mongo cluster(docker compose)</title>
+      <link href="2022/11/10/Mongo_0/"/>
+      <url>2022/11/10/Mongo_0/</url>
+      
+        <content type="html"><![CDATA[<p>初次使用docker compose搭建mongo集群，记录一下。虽然问题还很多，但至少跑起来了。。。</p><span id="more"></span><h2 id="0x0-文件目录结构"><a href="#0x0-文件目录结构" class="headerlink" title="0x0.文件目录结构"></a>0x0.文件目录结构</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mongodb</span><br><span class="line">└── mongo</span><br><span class="line">    ├── data</span><br><span class="line">    │   ├── hosts</span><br><span class="line">    │   └── mongod.conf</span><br><span class="line">    └── docker-compose.yml</span><br></pre></td></tr></table></figure><h2 id="0x1-mongod-conf"><a href="#0x1-mongod-conf" class="headerlink" title="0x1.mongod.conf"></a>0x1.mongod.conf</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">systemLog:</span><br><span class="line">  destination: file</span><br><span class="line">  path: &#x2F;data&#x2F;log&#x2F;mongo.log</span><br><span class="line">  logAppend: true</span><br><span class="line">storage:</span><br><span class="line">  dbPath: &#x2F;data&#x2F;db</span><br><span class="line">net:</span><br><span class="line">  bindIp: 0.0.0.0</span><br><span class="line">replication:</span><br><span class="line">  replSetName: rs0</span><br></pre></td></tr></table></figure><h2 id="0x2-hosts"><a href="#0x2-hosts" class="headerlink" title="0x2.hosts"></a>0x2.hosts</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1localhost</span><br><span class="line">255.255.255.255broadcasthost</span><br><span class="line">::1                     localhost</span><br></pre></td></tr></table></figure><h2 id="0x3-docker-compose-yml"><a href="#0x3-docker-compose-yml" class="headerlink" title="0x3.docker-compose.yml"></a>0x3.docker-compose.yml</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3&#x27;</span></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">db:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">mongo1:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mongo</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mongo1</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">mongod</span> <span class="string">--config</span> <span class="string">/etc/mongod.conf</span></span><br><span class="line">    <span class="attr">expose:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">27017</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo1/db:/data/db</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo1/configdb:/data/configdb</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo1/log:/data/log</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongod.conf:/etc/mongod.conf</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/hosts:/etc/hosts</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;27017:27017&quot;</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">db</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">mongo2:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mongo</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mongo2</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">mongod</span> <span class="string">--config</span> <span class="string">/etc/mongod.conf</span></span><br><span class="line">    <span class="attr">expose:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">27017</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo2/db:/data/db</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo2/configdb:/data/configdb</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo2/log:/data/log</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongod.conf:/etc/mongod.conf</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/hosts:/etc/hosts</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;27018:27017&quot;</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">db</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">mongo3:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mongo</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mongo3</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">mongod</span> <span class="string">--config</span> <span class="string">/etc/mongod.conf</span></span><br><span class="line">    <span class="attr">expose:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">27017</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo3/db:/data/db</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo3/configdb:/data/configdb</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongo3/log:/data/log</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/mongod.conf:/etc/mongod.conf</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">./data/hosts:/etc/hosts</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;27019:27017&quot;</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">db</span></span><br><span class="line"></span><br></pre></td></tr></table></figure><h2 id="0x4-开始部署"><a href="#0x4-开始部署" class="headerlink" title="0x4.开始部署"></a>0x4.开始部署</h2><ul><li>进入docker-compose.yml文件所在目录</li><li>执行命令：<code>docker compose -f docker-compose.yml up -d</code></li></ul><h2 id="0x5-建立副本集"><a href="#0x5-建立副本集" class="headerlink" title="0x5.建立副本集"></a>0x5.建立副本集</h2><ul><li><p>进入mongo容器：<code>docker exec -it mongo1 bash</code></p></li><li><p>进入mongo：<code>mongosh</code> ,老版本的mongo到指令是<code>mongo</code></p></li><li><p>切换管理员用户：<code>use admin</code></p></li><li><p>初始化副本集：<code>rs.initiate()</code>,无参初始化时，会默认当前节点PRIMARY节点</p></li><li><p>添加副节点：<code>rs.add(&#39;mongo2:27017&#39;)</code></p></li><li><p>添加仲裁节点：<code>rs.addArb(&#39;mongo3:27017&#39;)</code></p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 添加仲裁节点要是报错，可以试试运行以下代码</span><br><span class="line"> db.adminCommand(&#123;</span><br><span class="line">  &quot;setDefaultRWConcern&quot; : 1,</span><br><span class="line">  &quot;defaultWriteConcern&quot; : &#123;</span><br><span class="line">    &quot;w&quot; : 2</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></li><li><p>查看副本集配置信息：<code>rs.conf()</code></p></li><li><p>查看副本集运行状态：<code>rs.status()</code></p></li></ul><p>要是需要修改配置，可以按照以下步骤来：</p><ul><li><code>cfg = rs.conf()</code></li><li><code>cfg.members[0].xxx = xxx</code></li><li><code>rs.reconfig(cfg)</code></li></ul><h2 id="0x6-验证副本集"><a href="#0x6-验证副本集" class="headerlink" title="0x6.验证副本集"></a>0x6.验证副本集</h2><p>切换节点查看同步状态：<code>rs.printReplicationInfo()</code></p><p>仅当建立了集合后副节点才会进行同步。</p><h2 id="0x7-外部连接"><a href="#0x7-外部连接" class="headerlink" title="0x7.外部连接"></a>0x7.外部连接</h2><p>准备使用Robo 3T(现在变成Studio 3T Free)连接数据库时，会有连接失败的异常，可以将WSL的IP地址写入电脑C盘hosts文件里：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">172.23.224.1mongo1</span><br><span class="line">172.23.224.1mongo2</span><br><span class="line">172.23.224.1mongo3</span><br></pre></td></tr></table></figure><p>然后使用以下链接来连接数据库</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mongo1:27017</span><br><span class="line">mongo2:27017</span><br><span class="line">mongo3:27017</span><br></pre></td></tr></table></figure><p>但是如果还是连接不上，或者重启后连接不上，可以将<code>mongo</code>容器的IP写到<code>mongo\data\hosts</code>文件里，容器的IP可以使用<code>docker inspect mongo1</code>来获取。</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">172.30.0.2 mongo1</span><br><span class="line">172.30.0.3 mongo2</span><br><span class="line">172.30.0.4 mongo3</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> Database </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> DB </tag>
+            
+            <tag> mongo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Go语言中new和make的区别</title>
+      <link href="2022/11/07/Go_New_and_Make/"/>
+      <url>2022/11/07/Go_New_and_Make/</url>
+      
+        <content type="html"><![CDATA[<p>在Go语言中，make关键字在初始化的时候被频繁使用，之前写C# 的时候都是使用new关键字，Go中new关键字也是存在的。准备看看两者的区别。</p><span id="more"></span><h2 id="0x0-new"><a href="#0x0-new" class="headerlink" title="0x0.new"></a>0x0.new</h2><p><code>new</code>可以对类型进行内存创建和初始化，<strong>其返回值是所创建类型的指针引用</strong>。<code>new</code>会根据变量类型返回一个指向该类型的指针。</p><h2 id="0x1-make"><a href="#0x1-make" class="headerlink" title="0x1.make"></a>0x1.make</h2><p><code>make</code> 函数也是用于内存分配的，但是和<code>new</code>不同，仅支持 <code>slice</code>、<code>map</code>、<code>channel</code> 三种数据类型的内存创建，其返回值是所创建类型的本身，而不是新的指针引用。<code>make</code>不仅可以开辟一个内存，还能给这个内存的类型初始化其零值。</p><h2 id="0x2-总结"><a href="#0x2-总结" class="headerlink" title="0x2.总结"></a>0x2.总结</h2><ul><li>make和new都是golang用来分配内存的函数，且在堆上分配内存，make 即分配内存，也初始化内存。new只是将内存清零，并没有初始化内存。</li><li>make返回的还是引用类型本身；而new返回的是指向类型的指针。</li><li>make只能用来分配及初始化类型为slice，map，channel的数据；new可以分配任意类型的数据。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> Go </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> make </tag>
+            
+            <tag> new </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Windows10下WSL2和Docker的安装和配置</title>
       <link href="2022/11/06/Win10_WSL_Docker/"/>
       <url>2022/11/06/Win10_WSL_Docker/</url>
@@ -20,9 +74,9 @@
       
         <tags>
             
-            <tag> tool </tag>
-            
             <tag> mongo </tag>
+            
+            <tag> tool </tag>
             
         </tags>
       
