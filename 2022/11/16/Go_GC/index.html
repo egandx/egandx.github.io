@@ -22,21 +22,21 @@
     var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="不同语言的反射模型不尽相同。闲来无事，看看Go的反射机制。">
+  <meta name="description" content="内存管理是程序员开发应用的一大难题。传统的系统级编程语言（主要指C&#x2F;C++）中，程序开发者必须对内存小心的进行管理操作，控制内存的申请及释放。 因为稍有不慎，就可能产生内存泄露问题，这种问题不易发现并且难以定位，一直成为困扰程序开发者的噩梦。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go反射(reflect)">
-<meta property="og:url" content="https://blog.eganx.cn/2022/11/13/Go_reflect/index.html">
+<meta property="og:title" content="Golang GC(Garbage Collection)">
+<meta property="og:url" content="https://blog.eganx.cn/2022/11/16/Go_GC/index.html">
 <meta property="og:site_name" content="Egan&#39;s Blog">
-<meta property="og:description" content="不同语言的反射模型不尽相同。闲来无事，看看Go的反射机制。">
+<meta property="og:description" content="内存管理是程序员开发应用的一大难题。传统的系统级编程语言（主要指C&#x2F;C++）中，程序开发者必须对内存小心的进行管理操作，控制内存的申请及释放。 因为稍有不慎，就可能产生内存泄露问题，这种问题不易发现并且难以定位，一直成为困扰程序开发者的噩梦。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-11-13T11:21:43.000Z">
-<meta property="article:modified_time" content="2022-12-27T09:04:09.169Z">
+<meta property="article:published_time" content="2022-11-16T14:12:29.000Z">
+<meta property="article:modified_time" content="2022-12-28T02:45:00.841Z">
 <meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="GC">
 <meta property="article:tag" content="go">
-<meta property="article:tag" content="reflect">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.eganx.cn/2022/11/13/Go_reflect/">
+<link rel="canonical" href="https://blog.eganx.cn/2022/11/16/Go_GC/">
 
 
 <script id="page-configurations">
@@ -49,7 +49,7 @@
   };
 </script>
 
-  <title>Go反射(reflect) | Egan's Blog</title>
+  <title>Golang GC(Garbage Collection) | Egan's Blog</title>
   
 
 
@@ -207,7 +207,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/13/Go_reflect/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/16/Go_GC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -220,7 +220,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Go反射(reflect)
+          Golang GC(Garbage Collection)
         </h1>
 
         <div class="post-meta">
@@ -230,7 +230,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-11-13 19:21:43" itemprop="dateCreated datePublished" datetime="2022-11-13T19:21:43+08:00">2022-11-13</time>
+              <time title="创建时间：2022-11-16 22:12:29" itemprop="dateCreated datePublished" datetime="2022-11-16T22:12:29+08:00">2022-11-16</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,42 +253,85 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>不同语言的反射模型不尽相同。闲来无事，看看Go的反射机制。</p>
+        <p>内存管理是程序员开发应用的一大难题。传统的系统级编程语言（主要指C/C++）中，程序开发者必须对内存小心的进行管理操作，控制内存的申请及释放。 因为稍有不慎，就可能产生内存泄露问题，这种问题不易发现并且难以定位，一直成为困扰程序开发者的噩梦。</p>
 <span id="more"></span>
 
-<h2 id="0x0-反射的定义"><a href="#0x0-反射的定义" class="headerlink" title="0x0.反射的定义"></a>0x0.反射的定义</h2><p>维基百科上反射的定义：</p>
-<blockquote>
-<p>在计算机科学中，反射是指电脑程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。用比喻来说，反射就是程序在运行的时候能够“观察”并且修改自己的行为。</p>
-</blockquote>
-<p>Go 语言提供了一种机制在运行时更新变量和检查它们的值、调用它们的方法，但是在编译时并不知道这些变量的具体类型，这称为反射机制。</p>
-<h2 id="0x1-反射的实现"><a href="#0x1-反射的实现" class="headerlink" title="0x1.反射的实现"></a>0x1.反射的实现</h2><p>反射通过接口的类型信息实现。反射是建立在类型的基础上。</p>
-<p>Go在reflect包中定义了各种类型，实现了反射的各种函数，通过它们可以在运行时检测类型的信息和改变类型的值。</p>
-<h4 id="1-反射的基本函数"><a href="#1-反射的基本函数" class="headerlink" title="1).反射的基本函数"></a>1).反射的基本函数</h4><p>reflect 包里定义了一个接口和一个结构体，即 <code>reflect.Type</code> 和 <code>reflect.Value</code>，它们提供很多函数来获取存储在接口里的类型信息。</p>
-<p><code>reflect.Type</code> 主要提供关于类型相关的信息，所以它和 <code>_type</code> 关联比较紧密；<code>reflect.Value</code> 则结合 <code>_type</code> 和 <code>data</code> 两者，因此我们可以获取甚至改变类型的值。</p>
-<p>reflect 包中提供了两个基础的关于反射的函数来获取上述的接口和结构体：</p>
-<blockquote>
-<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TypeOf</span><span class="params">(i <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">Type</span></span> </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ValueOf</span><span class="params">(i <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">Value</span></span></span><br></pre></td></tr></table></figure>
-</blockquote>
-<p><code>TypeOf</code> 函数用来提取一个接口中值的类型信息。由于它的输入参数是一个空的 <code>interface&#123;&#125;</code>，调用此函数时，实参会先被转化为 <code>interface&#123;&#125;</code>类型。这样，实参的类型信息、方法集、值信息都存储到 <code>interface&#123;&#125;</code> 变量里了。</p>
-<p><code>fmt.Printf()</code> 函数，如果使用 <code>%T</code> 来作为格式参数，输出的是 <code>reflect.TypeOf</code> 的结果，也就是动态类型。</p>
-<p><code>TypeOf()</code> 函数返回一个接口，这个接口定义了一系列方法，利用这些方法可以获取关于类型的所有信息； <code>ValueOf()</code> 函数返回一个结构体变量，包含类型信息以及实际值。</p>
-<h4 id="2-反射的三大定律"><a href="#2-反射的三大定律" class="headerlink" title="2).反射的三大定律"></a>2).反射的三大定律</h4><ul>
-<li><p> Reflection goes from interface value to reflection object.</p>
+<h2 id="0x0-Garbage-Collection"><a href="#0x0-Garbage-Collection" class="headerlink" title="0x0.Garbage Collection"></a>0x0.Garbage Collection</h2><p>GC(Garbage Collection)，垃圾回收是一种自动内存管理机制。当某个程序占用的一部分内存空间不再被这个程序访问时，这个程序会借助<strong>垃圾回收</strong>算法向操作系统归还这部分内存空间。垃圾回收器可以减轻程序员的负担，也减少程序中的错误。垃圾回收最早起源于<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/LISP">LISP</a>语言。</p>
+<p>垃圾回收器的执行过程通常被划分成两个独立的组件：</p>
+<ul>
+<li>赋值器：指代用户态的代码。对于垃圾回收器来说，用户态的代码只是在修改对象之间的引用关系。</li>
+<li>回收器：负责执行垃圾回收的代码。</li>
+</ul>
+<h2 id="0x1-根对象"><a href="#0x1-根对象" class="headerlink" title="0x1.根对象"></a>0x1.根对象</h2><p>根集合是垃圾回收器在标记过程中最先检查的对象，包括：</p>
+<ul>
+<li>全局变量</li>
+<li>执行栈：每个goroutine都包含自己的执行栈，包含栈上的变量以及指向分配的堆内存区块的指针。</li>
+<li>寄存器</li>
+</ul>
+<h2 id="0x2-GC实现方式"><a href="#0x2-GC实现方式" class="headerlink" title="0x2.GC实现方式"></a>0x2.GC实现方式</h2><p>GC的常见实现方式有追踪式GC和引用计数式GC。</p>
+<ul>
+<li><p>追踪式GC</p>
+<p>从根对象出发，根据对象之间的引用信息，逐步扫描直至扫完整个堆并确定保留的对象，从而回收所有可回收的对象。</p>
 </li>
-<li><p> Reflection goes from reflection object to interface value.</p>
-</li>
-<li><p>To modify a reflection object, the value must be settable.</p>
-<p><code>接口型变量</code> 和 <code>反射类型对象</code> 可以相互转化。如果想要操作原变量，反射变量 <code>Value</code> 必须要 hold 住原变量的地址才行。</p>
+<li><p>引用计数式GC</p>
+<p>每个对象自身包含一个被引用的计数器，当计数器归零时自动得到回收。</p>
 </li>
 </ul>
-<h2 id="0x2-反射的使用场景"><a href="#0x2-反射的使用场景" class="headerlink" title="0x2.反射的使用场景"></a>0x2.反射的使用场景</h2><p>使用反射的常见场景有以下两种：</p>
+<p>Go 的 GC 目前使用的是无分代（对象没有代际之分）、非移动（回收过程中不对对象进行移动与整理）、并发（与用户代码并发执行）的三色标记清扫算法。属于追踪式GC的一种。</p>
+<h2 id="0x3-三色标记法"><a href="#0x3-三色标记法" class="headerlink" title="0x3.三色标记法"></a>0x3.三色标记法</h2><p>golang的垃圾回收是基于标记清扫算法，这种算法需要进行STW(stop the world)，这个过程会导致程序卡顿，所以频繁的GC是会严重影响程序性能的。golang在此基础上进行了改进，通过<strong>三色标记清扫算法</strong>和<strong>写屏障</strong>来减少STW的时间。</p>
+<h4 id="GC的四个过程"><a href="#GC的四个过程" class="headerlink" title="GC的四个过程"></a>GC的四个过程</h4><ul>
+<li>1、栈扫描（开始时STW），所有对象开始都是白色。</li>
+<li>2、从root开始找到所有可达对象（所有可以找到的对象），标记成灰色，放入待处理队列。</li>
+<li>3、遍历灰色对象队列，将其<strong>引用对象</strong>标记成灰色放入待处理队列，自身标记为黑色。</li>
+<li>4、清除（并发）循环步骤3直到灰色队列为空。此时所有的引用对象都被标记为黑色，所有不可达的对象依然是白色，白色的就是需要进行回收的对象。</li>
+</ul>
+<p>三色标记法相对于普通的标记清扫，减少了STW的时间，这主要得益于标记过程是”on-the-fly”的，标记过程中是不需要STW的，它与程序是并发执行的，大大缩短了STW的时间。Golang gc优化的核心就是尽量使得STW的时间越来越短。</p>
+<table>
+<thead>
+<tr>
+<th align="center">阶段</th>
+<th align="center">说明</th>
+<th align="center">赋值器状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">SweepTermination</td>
+<td align="center">清扫终止阶段，为下一个阶段的并发标记做准备工作，启动写屏障</td>
+<td align="center">STW</td>
+</tr>
+<tr>
+<td align="center">Mark</td>
+<td align="center">扫描标记阶段，与赋值器并发执行，写屏障开启</td>
+<td align="center">并发</td>
+</tr>
+<tr>
+<td align="center">MarkTermination</td>
+<td align="center">标记终止阶段，保证一个周期内标记任务完成，停止写屏障</td>
+<td align="center">STW</td>
+</tr>
+<tr>
+<td align="center">GCoff</td>
+<td align="center">内存清扫阶段，将需要回收的内存归还到堆中，写屏障关闭</td>
+<td align="center">并发</td>
+</tr>
+<tr>
+<td align="center">GCoff</td>
+<td align="center">内存归还阶段，将过多的内存归还给操作系统，写屏障关闭</td>
+<td align="center">并发</td>
+</tr>
+</tbody></table>
+<h4 id="写屏障"><a href="#写屏障" class="headerlink" title="写屏障"></a>写屏障</h4><p>当标记的程序是并发执行的，有可能在标记过程中，有新的引用产生，可能会导致误清扫。</p>
+<p>清扫开始前，标记为黑色的对象引用一个新申请的对象，此时它肯定是白色的，而黑色对象不会被再次扫描，那么这个白色对象无法被扫描变成灰色、黑色，它最终会被清扫，而实际上它不应该被清扫。</p>
+<p>golang采取了写屏障，其作用就是为了避免这类误清扫问题。写屏障在内存写操作前，维护一个约束，从而确保清扫开始前，黑色的对象不能引用白色对象。</p>
+<h2 id="0x4-触发GC的时机"><a href="#0x4-触发GC的时机" class="headerlink" title="0x4.触发GC的时机"></a>0x4.触发GC的时机</h2><p>Go 语言中对 GC 的触发时机存在两种形式：</p>
 <ol>
-<li>不能明确接口调用哪个函数，需要根据传入的参数在运行时决定。</li>
-<li>不能明确传入函数的参数类型，需要在运行时处理任意对象。</li>
+<li><strong>主动触发</strong>，通过调用 runtime.GC 来触发 GC，此调用阻塞式地等待当前 GC 运行完毕。</li>
+<li><strong>被动触发</strong>，分为两种方式：<ul>
+<li>使用系统监控，当超过两分钟没有产生任何 GC 时，强制触发 GC。</li>
+<li>使用步调（Pacing）算法，其核心思想是控制内存增长的比例，当前内存分配达到一定比例则触发。</li>
+</ul>
+</li>
 </ol>
-<blockquote>
-<p> 反射对性能影响还是比较大的，比正常代码运行速度慢一到两个数量级。关键代码避免使用反射特性。</p>
-</blockquote>
 
     </div>
 
@@ -298,8 +341,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/GC/" rel="tag"># GC</a>
               <a href="/tags/go/" rel="tag"># go</a>
-              <a href="/tags/reflect/" rel="tag"># reflect</a>
           </div>
 
         
@@ -308,13 +351,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/11/10/Mongo_0/" rel="prev" title="Mongo cluster(docker compose)">
-      <i class="fa fa-chevron-left"></i> Mongo cluster(docker compose)
+    <a href="/2022/11/13/Go_reflect/" rel="prev" title="Go反射(reflect)">
+      <i class="fa fa-chevron-left"></i> Go反射(reflect)
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/11/16/Go_GC/" rel="next" title="Golang GC(Garbage Collection)">
-      Golang GC(Garbage Collection) <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     

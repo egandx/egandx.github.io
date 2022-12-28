@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Golang GC(Garbage Collection)</title>
+      <link href="2022/11/16/Go_GC/"/>
+      <url>2022/11/16/Go_GC/</url>
+      
+        <content type="html"><![CDATA[<p>内存管理是程序员开发应用的一大难题。传统的系统级编程语言（主要指C/C++）中，程序开发者必须对内存小心的进行管理操作，控制内存的申请及释放。 因为稍有不慎，就可能产生内存泄露问题，这种问题不易发现并且难以定位，一直成为困扰程序开发者的噩梦。</p><span id="more"></span><h2 id="0x0-Garbage-Collection"><a href="#0x0-Garbage-Collection" class="headerlink" title="0x0.Garbage Collection"></a>0x0.Garbage Collection</h2><p>GC(Garbage Collection)，垃圾回收是一种自动内存管理机制。当某个程序占用的一部分内存空间不再被这个程序访问时，这个程序会借助<strong>垃圾回收</strong>算法向操作系统归还这部分内存空间。垃圾回收器可以减轻程序员的负担，也减少程序中的错误。垃圾回收最早起源于<a href="https://zh.wikipedia.org/wiki/LISP">LISP</a>语言。</p><p>垃圾回收器的执行过程通常被划分成两个独立的组件：</p><ul><li>赋值器：指代用户态的代码。对于垃圾回收器来说，用户态的代码只是在修改对象之间的引用关系。</li><li>回收器：负责执行垃圾回收的代码。</li></ul><h2 id="0x1-根对象"><a href="#0x1-根对象" class="headerlink" title="0x1.根对象"></a>0x1.根对象</h2><p>根集合是垃圾回收器在标记过程中最先检查的对象，包括：</p><ul><li>全局变量</li><li>执行栈：每个goroutine都包含自己的执行栈，包含栈上的变量以及指向分配的堆内存区块的指针。</li><li>寄存器</li></ul><h2 id="0x2-GC实现方式"><a href="#0x2-GC实现方式" class="headerlink" title="0x2.GC实现方式"></a>0x2.GC实现方式</h2><p>GC的常见实现方式有追踪式GC和引用计数式GC。</p><ul><li><p>追踪式GC</p><p>从根对象出发，根据对象之间的引用信息，逐步扫描直至扫完整个堆并确定保留的对象，从而回收所有可回收的对象。</p></li><li><p>引用计数式GC</p><p>每个对象自身包含一个被引用的计数器，当计数器归零时自动得到回收。</p></li></ul><p>Go 的 GC 目前使用的是无分代（对象没有代际之分）、非移动（回收过程中不对对象进行移动与整理）、并发（与用户代码并发执行）的三色标记清扫算法。属于追踪式GC的一种。</p><h2 id="0x3-三色标记法"><a href="#0x3-三色标记法" class="headerlink" title="0x3.三色标记法"></a>0x3.三色标记法</h2><p>golang的垃圾回收是基于标记清扫算法，这种算法需要进行STW(stop the world)，这个过程会导致程序卡顿，所以频繁的GC是会严重影响程序性能的。golang在此基础上进行了改进，通过<strong>三色标记清扫算法</strong>和<strong>写屏障</strong>来减少STW的时间。</p><h4 id="GC的四个过程"><a href="#GC的四个过程" class="headerlink" title="GC的四个过程"></a>GC的四个过程</h4><ul><li>1、栈扫描（开始时STW），所有对象开始都是白色。</li><li>2、从root开始找到所有可达对象（所有可以找到的对象），标记成灰色，放入待处理队列。</li><li>3、遍历灰色对象队列，将其<strong>引用对象</strong>标记成灰色放入待处理队列，自身标记为黑色。</li><li>4、清除（并发）循环步骤3直到灰色队列为空。此时所有的引用对象都被标记为黑色，所有不可达的对象依然是白色，白色的就是需要进行回收的对象。</li></ul><p>三色标记法相对于普通的标记清扫，减少了STW的时间，这主要得益于标记过程是”on-the-fly”的，标记过程中是不需要STW的，它与程序是并发执行的，大大缩短了STW的时间。Golang gc优化的核心就是尽量使得STW的时间越来越短。</p><table><thead><tr><th align="center">阶段</th><th align="center">说明</th><th align="center">赋值器状态</th></tr></thead><tbody><tr><td align="center">SweepTermination</td><td align="center">清扫终止阶段，为下一个阶段的并发标记做准备工作，启动写屏障</td><td align="center">STW</td></tr><tr><td align="center">Mark</td><td align="center">扫描标记阶段，与赋值器并发执行，写屏障开启</td><td align="center">并发</td></tr><tr><td align="center">MarkTermination</td><td align="center">标记终止阶段，保证一个周期内标记任务完成，停止写屏障</td><td align="center">STW</td></tr><tr><td align="center">GCoff</td><td align="center">内存清扫阶段，将需要回收的内存归还到堆中，写屏障关闭</td><td align="center">并发</td></tr><tr><td align="center">GCoff</td><td align="center">内存归还阶段，将过多的内存归还给操作系统，写屏障关闭</td><td align="center">并发</td></tr></tbody></table><h4 id="写屏障"><a href="#写屏障" class="headerlink" title="写屏障"></a>写屏障</h4><p>当标记的程序是并发执行的，有可能在标记过程中，有新的引用产生，可能会导致误清扫。</p><p>清扫开始前，标记为黑色的对象引用一个新申请的对象，此时它肯定是白色的，而黑色对象不会被再次扫描，那么这个白色对象无法被扫描变成灰色、黑色，它最终会被清扫，而实际上它不应该被清扫。</p><p>golang采取了写屏障，其作用就是为了避免这类误清扫问题。写屏障在内存写操作前，维护一个约束，从而确保清扫开始前，黑色的对象不能引用白色对象。</p><h2 id="0x4-触发GC的时机"><a href="#0x4-触发GC的时机" class="headerlink" title="0x4.触发GC的时机"></a>0x4.触发GC的时机</h2><p>Go 语言中对 GC 的触发时机存在两种形式：</p><ol><li><strong>主动触发</strong>，通过调用 runtime.GC 来触发 GC，此调用阻塞式地等待当前 GC 运行完毕。</li><li><strong>被动触发</strong>，分为两种方式：<ul><li>使用系统监控，当超过两分钟没有产生任何 GC 时，强制触发 GC。</li><li>使用步调（Pacing）算法，其核心思想是控制内存增长的比例，当前内存分配达到一定比例则触发。</li></ul></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> Golang </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> GC </tag>
+            
+            <tag> go </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Go反射(reflect)</title>
       <link href="2022/11/13/Go_reflect/"/>
       <url>2022/11/13/Go_reflect/</url>
