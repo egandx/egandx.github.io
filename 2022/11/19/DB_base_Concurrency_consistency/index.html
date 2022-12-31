@@ -22,21 +22,21 @@
     var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="不同语言的反射模型不尽相同。闲来无事，看看Go的反射机制。">
+  <meta name="description" content="在并发环境下，事务的隔离性很难保证，因此会出现很多并发一致性问题。产生并发不一致性问题的主要原因是破坏了事务的隔离性，解决方法是通过并发控制来保证隔离性。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go反射(reflect)">
-<meta property="og:url" content="https://blog.eganx.cn/2022/11/13/Go_reflect/index.html">
+<meta property="og:title" content="数据库基础--并发一致性问题">
+<meta property="og:url" content="https://blog.eganx.cn/2022/11/19/DB_base_Concurrency_consistency/index.html">
 <meta property="og:site_name" content="Egan&#39;s Blog">
-<meta property="og:description" content="不同语言的反射模型不尽相同。闲来无事，看看Go的反射机制。">
+<meta property="og:description" content="在并发环境下，事务的隔离性很难保证，因此会出现很多并发一致性问题。产生并发不一致性问题的主要原因是破坏了事务的隔离性，解决方法是通过并发控制来保证隔离性。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-11-13T11:21:43.000Z">
-<meta property="article:modified_time" content="2022-12-27T09:04:09.169Z">
+<meta property="article:published_time" content="2022-11-19T14:12:54.000Z">
+<meta property="article:modified_time" content="2022-12-31T02:54:27.732Z">
 <meta property="article:author" content="Egan Dong">
-<meta property="article:tag" content="go">
-<meta property="article:tag" content="reflect">
+<meta property="article:tag" content="DB">
+<meta property="article:tag" content="concurrency consistency">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://blog.eganx.cn/2022/11/13/Go_reflect/">
+<link rel="canonical" href="https://blog.eganx.cn/2022/11/19/DB_base_Concurrency_consistency/">
 
 
 <script id="page-configurations">
@@ -49,7 +49,7 @@
   };
 </script>
 
-  <title>Go反射(reflect) | Egan's Blog</title>
+  <title>数据库基础--并发一致性问题 | Egan's Blog</title>
   
 
 
@@ -207,7 +207,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/13/Go_reflect/">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/19/DB_base_Concurrency_consistency/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -220,7 +220,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Go反射(reflect)
+          数据库基础--并发一致性问题
         </h1>
 
         <div class="post-meta">
@@ -230,7 +230,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-11-13 19:21:43" itemprop="dateCreated datePublished" datetime="2022-11-13T19:21:43+08:00">2022-11-13</time>
+              <time title="创建时间：2022-11-19 22:12:54" itemprop="dateCreated datePublished" datetime="2022-11-19T22:12:54+08:00">2022-11-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -238,7 +238,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+                  <a href="/categories/Database/" itemprop="url" rel="index"><span itemprop="name">Database</span></a>
                 </span>
             </span>
 
@@ -253,42 +253,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>不同语言的反射模型不尽相同。闲来无事，看看Go的反射机制。</p>
+        <p>在并发环境下，事务的隔离性很难保证，因此会出现很多并发一致性问题。产生并发不一致性问题的主要原因是破坏了事务的隔离性，解决方法是通过并发控制来保证隔离性。</p>
 <span id="more"></span>
 
-<h2 id="0x0-反射的定义"><a href="#0x0-反射的定义" class="headerlink" title="0x0.反射的定义"></a>0x0.反射的定义</h2><p>维基百科上反射的定义：</p>
-<blockquote>
-<p>在计算机科学中，反射是指电脑程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。用比喻来说，反射就是程序在运行的时候能够“观察”并且修改自己的行为。</p>
-</blockquote>
-<p>Go 语言提供了一种机制在运行时更新变量和检查它们的值、调用它们的方法，但是在编译时并不知道这些变量的具体类型，这称为反射机制。</p>
-<h2 id="0x1-反射的实现"><a href="#0x1-反射的实现" class="headerlink" title="0x1.反射的实现"></a>0x1.反射的实现</h2><p>反射通过接口的类型信息实现。反射是建立在类型的基础上。</p>
-<p>Go在reflect包中定义了各种类型，实现了反射的各种函数，通过它们可以在运行时检测类型的信息和改变类型的值。</p>
-<h4 id="1-反射的基本函数"><a href="#1-反射的基本函数" class="headerlink" title="1).反射的基本函数"></a>1).反射的基本函数</h4><p>reflect 包里定义了一个接口和一个结构体，即 <code>reflect.Type</code> 和 <code>reflect.Value</code>，它们提供很多函数来获取存储在接口里的类型信息。</p>
-<p><code>reflect.Type</code> 主要提供关于类型相关的信息，所以它和 <code>_type</code> 关联比较紧密；<code>reflect.Value</code> 则结合 <code>_type</code> 和 <code>data</code> 两者，因此我们可以获取甚至改变类型的值。</p>
-<p>reflect 包中提供了两个基础的关于反射的函数来获取上述的接口和结构体：</p>
-<blockquote>
-<figure class="highlight golang"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TypeOf</span><span class="params">(i <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">Type</span></span> </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ValueOf</span><span class="params">(i <span class="keyword">interface</span>&#123;&#125;)</span> <span class="title">Value</span></span></span><br></pre></td></tr></table></figure>
-</blockquote>
-<p><code>TypeOf</code> 函数用来提取一个接口中值的类型信息。由于它的输入参数是一个空的 <code>interface&#123;&#125;</code>，调用此函数时，实参会先被转化为 <code>interface&#123;&#125;</code>类型。这样，实参的类型信息、方法集、值信息都存储到 <code>interface&#123;&#125;</code> 变量里了。</p>
-<p><code>fmt.Printf()</code> 函数，如果使用 <code>%T</code> 来作为格式参数，输出的是 <code>reflect.TypeOf</code> 的结果，也就是动态类型。</p>
-<p><code>TypeOf()</code> 函数返回一个接口，这个接口定义了一系列方法，利用这些方法可以获取关于类型的所有信息； <code>ValueOf()</code> 函数返回一个结构体变量，包含类型信息以及实际值。</p>
-<h4 id="2-反射的三大定律"><a href="#2-反射的三大定律" class="headerlink" title="2).反射的三大定律"></a>2).反射的三大定律</h4><ul>
-<li><p> Reflection goes from interface value to reflection object.</p>
-</li>
-<li><p> Reflection goes from reflection object to interface value.</p>
-</li>
-<li><p>To modify a reflection object, the value must be settable.</p>
-<p><code>接口型变量</code> 和 <code>反射类型对象</code> 可以相互转化。如果想要操作原变量，反射变量 <code>Value</code> 必须要 hold 住原变量的地址才行。</p>
-</li>
-</ul>
-<h2 id="0x2-反射的使用场景"><a href="#0x2-反射的使用场景" class="headerlink" title="0x2.反射的使用场景"></a>0x2.反射的使用场景</h2><p>使用反射的常见场景有以下两种：</p>
-<ol>
-<li>不能明确接口调用哪个函数，需要根据传入的参数在运行时决定。</li>
-<li>不能明确传入函数的参数类型，需要在运行时处理任意对象。</li>
-</ol>
-<blockquote>
-<p> 反射对性能影响还是比较大的，比正常代码运行速度慢一到两个数量级。关键代码避免使用反射特性。</p>
-</blockquote>
+<h2 id="0x0-丢失修改"><a href="#0x0-丢失修改" class="headerlink" title="0x0.丢失修改"></a>0x0.丢失修改</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">┌──────────┐     ┌──────────┐</span><br><span class="line">│ T1 Start │     │ T2 Start │</span><br><span class="line">└─────┬────┘     └─────┬────┘</span><br><span class="line">      │                │</span><br><span class="line">      ▼                │</span><br><span class="line">┌──────────┐           │</span><br><span class="line">│Write A&#x3D;10│           │</span><br><span class="line">└─────┬────┘           │</span><br><span class="line">      │                ▼</span><br><span class="line">      │          ┌──────────┐</span><br><span class="line">      │          │Write A&#x3D;20│</span><br><span class="line">      │          └─────┬────┘</span><br><span class="line">      │                │</span><br><span class="line">      ▼                ▼</span><br><span class="line">┌──────────┐     ┌──────────┐</span><br><span class="line">│  T1 End  │     │  T2 End  │</span><br><span class="line">└──────────┘     └──────────┘</span><br><span class="line">  	A&#x3D;20						 A&#x3D;20</span><br></pre></td></tr></table></figure>
+
+<p>丢失修改指一个事务的更新操作被另外一个事务的更新操作替换。一般在现实生活中常会遇到，例如：T1 和 T2 两个事务都对一个数据进行修改，T1 先修改并提交生效，T2 随后修改，T2 的修改覆盖了 T1 的修改。最终<code>A=20</code>，T1的修改丢失。</p>
+<h2 id="0x1-读脏数据"><a href="#0x1-读脏数据" class="headerlink" title="0x1.读脏数据"></a>0x1.读脏数据</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">┌──────────┐     ┌──────────┐</span><br><span class="line">│ T1 Start │     │ T2 Start │</span><br><span class="line">└─────┬────┘     └─────┬────┘</span><br><span class="line">      │                │</span><br><span class="line">      ▼                │</span><br><span class="line">┌──────────┐           │</span><br><span class="line">│ Read A&#x3D;10│           │</span><br><span class="line">└─────┬────┘           │</span><br><span class="line">      │                │</span><br><span class="line">      ▼                │</span><br><span class="line">┌──────────┐           │</span><br><span class="line">│Write A&#x3D;20│           │</span><br><span class="line">└─────┬────┘           ▼</span><br><span class="line">      │          ┌──────────┐</span><br><span class="line">      │          │ Read A&#x3D;20│</span><br><span class="line">      ▼          └─────┬────┘</span><br><span class="line">┌──────────┐           │</span><br><span class="line">│ Rollback │           │</span><br><span class="line">└─────┬────┘           │</span><br><span class="line">      │                │</span><br><span class="line">      ▼                ▼</span><br><span class="line">┌──────────┐     ┌──────────┐</span><br><span class="line">│  T1 End  │     │  T2 End  │</span><br><span class="line">└──────────┘     └──────────┘</span><br><span class="line">    A&#x3D;10             A&#x3D;20</span><br></pre></td></tr></table></figure>
+
+<p>读脏数据指在不同的事务下，当前事务可以读到另外事务未提交的数据。例如：T1 修改一个数据但未提交，T2 随后读取这个数据。如果 T1 撤销了这次修改，那么 T2 读取的数据是脏数据。</p>
+<h2 id="0x2-不可重复读"><a href="#0x2-不可重复读" class="headerlink" title="0x2.不可重复读"></a>0x2.不可重复读</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">┌──────────┐     ┌──────────┐</span><br><span class="line">│ T1 Start │     │ T2 Start │</span><br><span class="line">└─────┬────┘     └─────┬────┘</span><br><span class="line">      │                │</span><br><span class="line">      │                ▼</span><br><span class="line">      │          ┌──────────┐</span><br><span class="line">      │          │ Read A&#x3D;10│</span><br><span class="line">      │          └─────┬────┘</span><br><span class="line">      ▼                │</span><br><span class="line">┌──────────┐           │</span><br><span class="line">│Write A&#x3D;20│           │</span><br><span class="line">└─────┬────┘           │</span><br><span class="line">      │                │</span><br><span class="line">      │                ▼</span><br><span class="line">      │          ┌──────────┐</span><br><span class="line">      │          │ Read A&#x3D;20│</span><br><span class="line">      │          └─────┬────┘</span><br><span class="line">      │                │</span><br><span class="line">      │                │</span><br><span class="line">      │                │</span><br><span class="line">      ▼                ▼</span><br><span class="line">┌──────────┐     ┌──────────┐</span><br><span class="line">│  T1 End  │     │  T2 End  │</span><br><span class="line">└──────────┘     └──────────┘</span><br><span class="line">    A&#x3D;20             A&#x3D;20</span><br></pre></td></tr></table></figure>
+
+<p>不可重复读指在一个事务内多次读取同一数据集合。在这一事务还未结束前，另一事务也访问了该同一数据集合并做了修改，由于第二个事务的修改，第一次事务的两次读取的数据可能不一致。例如：T2 读取一个数据，T1 对该数据做了修改。如果 T2 再次读取这个数据，此时读取的结果和第一次读取的结果不同。</p>
+<h2 id="0x3-幻影读"><a href="#0x3-幻影读" class="headerlink" title="0x3.幻影读"></a>0x3.幻影读</h2><p>幻读本质上也属于不可重复读的情况，T1 读取某个范围的数据，T2 在这个范围内插入新的数据，T1 再次读取这个范围的数据，此时读取的结果和和第一次读取的结果不同。</p>
 
     </div>
 
@@ -298,8 +275,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/go/" rel="tag"># go</a>
-              <a href="/tags/reflect/" rel="tag"># reflect</a>
+              <a href="/tags/DB/" rel="tag"># DB</a>
+              <a href="/tags/concurrency-consistency/" rel="tag"># concurrency consistency</a>
           </div>
 
         
@@ -308,12 +285,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/11/10/DB_Mongo_0/" rel="prev" title="Mongo cluster(docker compose)">
-      <i class="fa fa-chevron-left"></i> Mongo cluster(docker compose)
+    <a href="/2022/11/19/DB_base_%20transaction/" rel="prev" title="数据库基础--事务">
+      <i class="fa fa-chevron-left"></i> 数据库基础--事务
     </a></div>
       <div class="post-nav-item">
-    <a href="/2022/11/16/Go_GC/" rel="next" title="Golang GC(Garbage Collection)">
-      Golang GC(Garbage Collection) <i class="fa fa-chevron-right"></i>
+    <a href="/2022/11/20/DB_base_%20lock_and_isolation/" rel="next" title="数据库基础--锁和隔离级别">
+      数据库基础--锁和隔离级别 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>

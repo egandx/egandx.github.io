@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.eganx.cn","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"remove","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="锁的类型和数据库事务隔离级别。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据库基础--锁和隔离级别">
+<meta property="og:url" content="https://blog.eganx.cn/2022/11/20/DB_base_%20lock_and_isolation/index.html">
+<meta property="og:site_name" content="Egan&#39;s Blog">
+<meta property="og:description" content="锁的类型和数据库事务隔离级别。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-20T07:54:23.000Z">
+<meta property="article:modified_time" content="2022-12-31T02:55:40.471Z">
+<meta property="article:author" content="Egan Dong">
+<meta property="article:tag" content="DB">
+<meta property="article:tag" content="lock">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.eganx.cn/2022/11/20/DB_base_%20lock_and_isolation/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>数据库基础--锁和隔离级别 | Egan's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Egan's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <h1 class="site-title">Egan's Blog</h1>
+    </a>
+      <p class="site-subtitle" itemprop="description">The winter is coming</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+				<!-- Matomo -->
+				<script>
+						var _paq = window._paq = window._paq || [];
+						/* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+					  _paq.push(['trackPageView']);
+					  _paq.push(['enableLinkTracking']);
+					  (function() {
+							 var u="https://matomo.eganx.cn:7003/matomo/";
+							 _paq.push(['setTrackerUrl', u+'matomo.php']);
+							 _paq.push(['setSiteId', '1']);
+							 var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+							 g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+					 })();
+			 </script>
+			 <!-- End Matomo Code -->
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.eganx.cn/2022/11/20/DB_base_%20lock_and_isolation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Egan Dong">
+      <meta itemprop="description" content="You are more than what you have become">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Egan's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据库基础--锁和隔离级别
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-20 15:54:23" itemprop="dateCreated datePublished" datetime="2022-11-20T15:54:23+08:00">2022-11-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Database/" itemprop="url" rel="index"><span itemprop="name">Database</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>锁的类型和数据库事务隔离级别。</p>
+<span id="more"></span>
+
+<h2 id="0x0-锁粒度"><a href="#0x0-锁粒度" class="headerlink" title="0x0.锁粒度"></a>0x0.锁粒度</h2><p>MySQL提供了行级锁和表级锁。</p>
+<p>应该尽量只锁定需要修改的那部分数据，而不是所有的资源。锁定的数据量越少，发生锁争用的可能性就越小，系统的并发程度就越高。</p>
+<p>但是加锁需要消耗资源，各种锁操作都会增加系统开销。因此锁的粒度越小，系统开销就越大。在选择锁粒度的时候，需要平衡锁开销和系统并发程度。</p>
+<h2 id="0x1-锁类型"><a href="#0x1-锁类型" class="headerlink" title="0x1.锁类型"></a>0x1.锁类型</h2><h4 id="1-读写锁"><a href="#1-读写锁" class="headerlink" title="1).读写锁"></a>1).读写锁</h4><ul>
+<li><p>互斥锁(Exclusive)，简写X锁，又称写锁。</p>
+</li>
+<li><p>共享锁(Shared)，简写S锁，又称读锁。</p>
+</li>
+<li><p>一个事务对数据对象A加了X锁，就可以对A进行读取和更新。加锁期间其他事务不能对A加任何锁。</p>
+</li>
+<li><p>一个事务对数据对象A加了S锁，可以对A进行读取操作，不能进行更新操作。加锁期间其他事务能对A加S锁，但是不能加X锁。</p>
+</li>
+</ul>
+<p>锁的兼容关系：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">X</th>
+<th align="center">S</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">X</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+</tr>
+<tr>
+<td align="center">S</td>
+<td align="center">❌</td>
+<td align="center"><strong>✔️</strong></td>
+</tr>
+</tbody></table>
+<h4 id="2-意向锁"><a href="#2-意向锁" class="headerlink" title="2).意向锁"></a>2).意向锁</h4><p>使用意向锁可以更容易地支持多粒度封锁。</p>
+<p>在存在行级锁和表级锁的情况下，事务T想要对表A加X锁，就需要先检测是否有其他事务对表A或者表A中的任意一行加了锁，需要对表A的每一行都检测一次，非常耗时。</p>
+<p>意向锁就是在原来的X/S锁之上引入了IX/IS锁，IX/IS锁都是表锁，用来表示一个事务想要在表中的某个数据行上加X锁或S锁。</p>
+<ul>
+<li>一个事务在获得某个数据行对象的S锁之前，必须先获得表的IS锁或者更强的锁。</li>
+<li>一个事务在获得某个数据行对象的X锁之前，必须先获得表的IX锁。</li>
+</ul>
+<p>通过引入意向锁，事务T想要对表A加X锁，只需要先检测是否有其他事务对表A加了X/IX/S/IS锁，如果加了就表示有其他事务正在使用这个表或者表中某一行的锁，因此事务T加X锁失败。</p>
+<p>各种锁的兼容关系：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">X</th>
+<th align="center">IX</th>
+<th align="center">S</th>
+<th align="center">IS</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">X</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+</tr>
+<tr>
+<td align="center">IX</td>
+<td align="center">❌</td>
+<td align="center">✔️</td>
+<td align="center">❌</td>
+<td align="center">✔️</td>
+</tr>
+<tr>
+<td align="center">S</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">✔️</td>
+<td align="center">✔️</td>
+</tr>
+<tr>
+<td align="center">IS</td>
+<td align="center">❌</td>
+<td align="center">✔️</td>
+<td align="center">✔️</td>
+<td align="center">✔️</td>
+</tr>
+</tbody></table>
+<ul>
+<li>任意IS/IX锁之间都是兼容的，因为它们只表示想要对表加锁，而不是真正加锁。</li>
+<li>兼容关系针对表级锁，而表级的IX锁和行级的X锁兼容，两个事务可以对两个数据行加X锁。（事务 T1 想要对数据行 R1 加 X 锁，事务 T2 想要对同一个表的数据行 R2 加 X 锁，两个事务都需要对该表加 IX 锁，但是 IX 锁是兼容的，并且 IX 锁与行级的 X 锁也是兼容的，因此两个事务都能加锁成功，对同一个表中的两个数据行做修改。）</li>
+</ul>
+<h2 id="0x2-锁协议"><a href="#0x2-锁协议" class="headerlink" title="0x2.锁协议"></a>0x2.锁协议</h2><h4 id="1-三级封锁协议"><a href="#1-三级封锁协议" class="headerlink" title="1).三级封锁协议"></a>1).三级封锁协议</h4><ul>
+<li><p>一级封锁协议</p>
+<p>事务T要修改数据A时必须加X锁，直到T结束才释放锁。</p>
+<p>可以解决丢失修改的问题，不能同时有两个事务对同一个数据进行修改，那么事务的修改就不会被覆盖。</p>
+</li>
+<li><p>二级封锁协议</p>
+<p>在一级的基础上，要求读取数据A时必须加S锁，读取完马上释放S锁。</p>
+<p>可以解决读脏数据问题，因为如果一个事务在对数据A进行修改，根据1级封锁协议，会加X锁，那么就不能再加S锁了，也就是不会读入脏数据。</p>
+</li>
+<li><p>三级封锁协议</p>
+<p>在二级的基础上，要求读取数据A时必须加S锁，直到事务结束了才能释放S锁。</p>
+<p>可以解决不可重复读的问题，因为读取A时，其他事务不能对A加X锁，从而避免了在读的期间数据发生改变。</p>
+</li>
+</ul>
+<h4 id="2-两段锁协议"><a href="#2-两段锁协议" class="headerlink" title="2).两段锁协议"></a>2).两段锁协议</h4><p>加锁和解锁分成两个阶段进行。</p>
+<p>可串行化调度是指通过并发控制，使得并发执行的事务结果与某个串行执行的事务结果相同。串行执行的事务互不干扰，不会出现并发一致性问题。</p>
+<p>事务遵循两段锁协议是保证可串行化调度的充分条件。例如以下操作满足两段锁协议，它是可串行化调度。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lock-x(A)...lock-s(B)...lock-s(C)...unlock(A)...unlock(C)...unlock(B)</span><br></pre></td></tr></table></figure>
+
+<p>但不是必要条件，例如以下操作不满足两段锁协议，但它还是可串行化调度。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">lock-x(A)...unlock(A)...lock-s(B)...unlock(B)...lock-s(C)...unlock(C)</span><br></pre></td></tr></table></figure>
+
+<p>MySQL的InnoDB存储引擎采用两段锁协议，会根据隔离级别在需要的时候自动加锁，并且所有的锁都是在同一时刻被释放，这也被称为隐式锁定。</p>
+<p>InnoDB也可使用语句进行显式加锁</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">LOCK</span> <span class="keyword">In</span> <span class="keyword">SHARE</span> <span class="keyword">MODE</span>;</span><br><span class="line"><span class="keyword">SELECT</span> ... <span class="keyword">FOR</span> <span class="keyword">UPDATE</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="0x3-隔离级别"><a href="#0x3-隔离级别" class="headerlink" title="0x3.隔离级别"></a>0x3.隔离级别</h2><h4 id="1-未提交读-READ-UNCOMMITTED"><a href="#1-未提交读-READ-UNCOMMITTED" class="headerlink" title="1).未提交读(READ UNCOMMITTED)"></a>1).未提交读(READ UNCOMMITTED)</h4><p>事务中的修改，即使没有提交，对其他事务也是可见的。</p>
+<h4 id="2-提交读-READ-COMMITTED"><a href="#2-提交读-READ-COMMITTED" class="headerlink" title="2).提交读(READ COMMITTED)"></a>2).提交读(READ COMMITTED)</h4><p>一个事务只能读取已经提交的事务所做的修改。换句话说，一个事务所做的修改在提交之前对其他事务是不可见的。</p>
+<h4 id="3-可重复读-REPEATABLE-READ"><a href="#3-可重复读-REPEATABLE-READ" class="headerlink" title="3).可重复读(REPEATABLE READ)"></a>3).可重复读(REPEATABLE READ)</h4><p>保证在同一个事务中多次读取同一数据的结果是一样的。</p>
+<h4 id="4-序列化（SERIALIZABLE）"><a href="#4-序列化（SERIALIZABLE）" class="headerlink" title="4).序列化（SERIALIZABLE）"></a>4).序列化（SERIALIZABLE）</h4><p>强制事务串行执行，这样多个事务互不干扰，不会出现并发一致性问题。</p>
+<p>该隔离级别需要加锁实现，使用加锁机制保证同一时间只有一个事务执行，也就是保证事务串行执行。</p>
+<p>隔离能解决的并发一致性问题如下所示：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">脏读</th>
+<th align="center">不可重复读</th>
+<th align="center">幻读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">未提交读</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+</tr>
+<tr>
+<td align="center">提交读</td>
+<td align="center">✔️</td>
+<td align="center">❌</td>
+<td align="center">❌</td>
+</tr>
+<tr>
+<td align="center">可重复读</td>
+<td align="center">✔️</td>
+<td align="center">✔️</td>
+<td align="center">❌</td>
+</tr>
+<tr>
+<td align="center">序列化</td>
+<td align="center">✔️</td>
+<td align="center">✔️</td>
+<td align="center">✔️</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DB/" rel="tag"># DB</a>
+              <a href="/tags/lock/" rel="tag"># lock</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/19/DB_base_Concurrency_consistency/" rel="prev" title="数据库基础--并发一致性问题">
+      <i class="fa fa-chevron-left"></i> 数据库基础--并发一致性问题
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  Copyright&copy; 2020–
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Egan Dong</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

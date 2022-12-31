@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.eganx.cn/2022/11/20/DB_base_%20lock_and_isolation/</loc>
+    <lastmod>2022-12-31</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/11/19/DB_base_Concurrency_consistency/</loc>
+    <lastmod>2022-12-31</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/11/19/DB_base_%20transaction/</loc>
+    <lastmod>2022-12-31</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2022/11/10/DB_Mongo_0/</loc>
+    <lastmod>2022-12-31</lastmod>
+  </url>
+  <url>
     <loc>https://blog.eganx.cn/2022/11/16/Go_GC/</loc>
     <lastmod>2022-12-28</lastmod>
   </url>
@@ -11,10 +27,6 @@
   <url>
     <loc>https://blog.eganx.cn/2022/11/13/Go_reflect/</loc>
     <lastmod>2022-12-27</lastmod>
-  </url>
-  <url>
-    <loc>https://blog.eganx.cn/2022/11/10/Mongo_0/</loc>
-    <lastmod>2022-12-26</lastmod>
   </url>
   <url>
     <loc>https://blog.eganx.cn/2022/11/06/Win10_WSL_Docker/</loc>
