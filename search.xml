@@ -13,8 +13,6 @@
       
       <categories>
           
-          <category> 数据结构 </category>
-          
           <category> Leetcode </category>
           
       </categories>
@@ -43,39 +41,6 @@
       
       
       <categories>
-          
-          <category> 数据结构 </category>
-          
-          <category> Leetcode </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Go </tag>
-            
-            <tag> Leetcode </tag>
-            
-            <tag> hashmap </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>349. 两个数组的交集</title>
-      <link href="2023/02/04/349.%20intersection_of_two_arrays/"/>
-      <url>2023/02/04/349.%20intersection_of_two_arrays/</url>
-      
-        <content type="html"><![CDATA[<p>链接： <a href="https://leetcode.cn/problems/intersection-of-two-arrays">https://leetcode.cn/problems/intersection-of-two-arrays</a></p><h3 id="0x0-题目描述"><a href="#0x0-题目描述" class="headerlink" title="0x0. 题目描述"></a>0x0. 题目描述</h3><p>给定两个数组 nums1 和 nums2 ，返回 它们的交集 。输出结果中的每个元素一定是 唯一 的。我们可以 不考虑输出结果的顺序 。</p><span id="more"></span><h3 id="0x1-示例"><a href="#0x1-示例" class="headerlink" title="0x1. 示例"></a>0x1. 示例</h3><p>示例 1：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">输入：nums1 &#x3D; [1,2,2,1], nums2 &#x3D; [2,2]</span><br><span class="line">输出：[2]</span><br></pre></td></tr></table></figure><p>示例 2：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">输入：nums1 &#x3D; [4,9,5], nums2 &#x3D; [9,4,9,8,4]</span><br><span class="line">输出：[9,4]</span><br><span class="line">解释：[4,9] 也是可通过的</span><br></pre></td></tr></table></figure><h3 id="0x2-提示"><a href="#0x2-提示" class="headerlink" title="0x2. 提示"></a>0x2. 提示</h3><ul><li><code>1 &lt;= nums1.length, nums2.length &lt;= 1000</code></li><li><code>0 &lt;= nums1[i], nums2[i] &lt;= 1000</code></li></ul><h3 id="0x3-解题思路"><a href="#0x3-解题思路" class="headerlink" title="0x3. 解题思路"></a>0x3. 解题思路</h3><ol><li> 创建一个空的切片 <code>res</code> 和一个空的哈希表 <code>set</code>。</li><li> 遍历数组 <code>nums1</code> 中的每个元素 <code>v</code>，如果 <code>v</code> 在哈希表 <code>set</code> 中不存在，则将其加入哈希表中。</li><li> 遍历数组 <code>nums2</code> 中的每个元素 <code>v</code>，如果 <code>v</code> 在哈希表 <code>set</code> 中存在，则将其加入切片 <code>res</code> 中，并从哈希表 <code>set</code> 中删除。</li><li> 返回切片 <code>res</code>。</li></ol><h3 id="0x4-Go-语言实现的代码示例："><a href="#0x4-Go-语言实现的代码示例：" class="headerlink" title="0x4. Go 语言实现的代码示例："></a>0x4. Go 语言实现的代码示例：</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">intersection</span><span class="params">(nums1 []<span class="keyword">int</span>, nums2 []<span class="keyword">int</span>)</span> []<span class="title">int</span></span> &#123;</span><br><span class="line">res := <span class="built_in">make</span>([]<span class="keyword">int</span>,<span class="number">0</span>)</span><br><span class="line">set := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">int</span>]<span class="keyword">interface</span>&#123;&#125;,<span class="number">0</span>)</span><br><span class="line"><span class="keyword">for</span> _, v := <span class="keyword">range</span> nums1 &#123;</span><br><span class="line"><span class="keyword">if</span> _, ok := set[v]; !ok&#123;</span><br><span class="line">set[v] = v <span class="comment">//赋值随意，只要后面能取到东西就行</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> _, v := <span class="keyword">range</span> nums2 &#123;</span><br><span class="line"><span class="keyword">if</span> _, ok := set[v]; ok&#123;</span><br><span class="line">res = <span class="built_in">append</span>(res, v)</span><br><span class="line"><span class="built_in">delete</span>(set,v)</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> res</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li>使用哈希表来记录一个数组中的元素，然后遍历另一个数组，找到其中在哈希表中出现过的元素。实现用一个接口类型来占据值的位置，只关注 key 的存在，而不关心具体的 value 值。</li><li>时间复杂度为 O(m+n)，空间复杂度为 O(min(m,n))，其中 m 和 n 分别为两个数组的长度。但需要注意的是，由于哈希表的散列函数可能会产生冲突，因此在极端情况下，时间复杂度可能会退化为 O(m * n)。</li></ul>]]></content>
-      
-      
-      <categories>
-          
-          <category> 数据结构 </category>
           
           <category> Leetcode </category>
           
@@ -106,7 +71,34 @@
       
       <categories>
           
-          <category> 数据结构 </category>
+          <category> Leetcode </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Go </tag>
+            
+            <tag> Leetcode </tag>
+            
+            <tag> hashmap </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>349. 两个数组的交集</title>
+      <link href="2023/02/04/349.%20intersection_of_two_arrays/"/>
+      <url>2023/02/04/349.%20intersection_of_two_arrays/</url>
+      
+        <content type="html"><![CDATA[<p>链接： <a href="https://leetcode.cn/problems/intersection-of-two-arrays">https://leetcode.cn/problems/intersection-of-two-arrays</a></p><h3 id="0x0-题目描述"><a href="#0x0-题目描述" class="headerlink" title="0x0. 题目描述"></a>0x0. 题目描述</h3><p>给定两个数组 nums1 和 nums2 ，返回 它们的交集 。输出结果中的每个元素一定是 唯一 的。我们可以 不考虑输出结果的顺序 。</p><span id="more"></span><h3 id="0x1-示例"><a href="#0x1-示例" class="headerlink" title="0x1. 示例"></a>0x1. 示例</h3><p>示例 1：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">输入：nums1 &#x3D; [1,2,2,1], nums2 &#x3D; [2,2]</span><br><span class="line">输出：[2]</span><br></pre></td></tr></table></figure><p>示例 2：</p><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">输入：nums1 &#x3D; [4,9,5], nums2 &#x3D; [9,4,9,8,4]</span><br><span class="line">输出：[9,4]</span><br><span class="line">解释：[4,9] 也是可通过的</span><br></pre></td></tr></table></figure><h3 id="0x2-提示"><a href="#0x2-提示" class="headerlink" title="0x2. 提示"></a>0x2. 提示</h3><ul><li><code>1 &lt;= nums1.length, nums2.length &lt;= 1000</code></li><li><code>0 &lt;= nums1[i], nums2[i] &lt;= 1000</code></li></ul><h3 id="0x3-解题思路"><a href="#0x3-解题思路" class="headerlink" title="0x3. 解题思路"></a>0x3. 解题思路</h3><ol><li> 创建一个空的切片 <code>res</code> 和一个空的哈希表 <code>set</code>。</li><li> 遍历数组 <code>nums1</code> 中的每个元素 <code>v</code>，如果 <code>v</code> 在哈希表 <code>set</code> 中不存在，则将其加入哈希表中。</li><li> 遍历数组 <code>nums2</code> 中的每个元素 <code>v</code>，如果 <code>v</code> 在哈希表 <code>set</code> 中存在，则将其加入切片 <code>res</code> 中，并从哈希表 <code>set</code> 中删除。</li><li> 返回切片 <code>res</code>。</li></ol><h3 id="0x4-Go-语言实现的代码示例："><a href="#0x4-Go-语言实现的代码示例：" class="headerlink" title="0x4. Go 语言实现的代码示例："></a>0x4. Go 语言实现的代码示例：</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">intersection</span><span class="params">(nums1 []<span class="keyword">int</span>, nums2 []<span class="keyword">int</span>)</span> []<span class="title">int</span></span> &#123;</span><br><span class="line">res := <span class="built_in">make</span>([]<span class="keyword">int</span>,<span class="number">0</span>)</span><br><span class="line">set := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">int</span>]<span class="keyword">interface</span>&#123;&#125;,<span class="number">0</span>)</span><br><span class="line"><span class="keyword">for</span> _, v := <span class="keyword">range</span> nums1 &#123;</span><br><span class="line"><span class="keyword">if</span> _, ok := set[v]; !ok&#123;</span><br><span class="line">set[v] = v <span class="comment">//赋值随意，只要后面能取到东西就行</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> _, v := <span class="keyword">range</span> nums2 &#123;</span><br><span class="line"><span class="keyword">if</span> _, ok := set[v]; ok&#123;</span><br><span class="line">res = <span class="built_in">append</span>(res, v)</span><br><span class="line"><span class="built_in">delete</span>(set,v)</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> res</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li>使用哈希表来记录一个数组中的元素，然后遍历另一个数组，找到其中在哈希表中出现过的元素。实现用一个接口类型来占据值的位置，只关注 key 的存在，而不关心具体的 value 值。</li><li>时间复杂度为 O(m+n)，空间复杂度为 O(min(m,n))，其中 m 和 n 分别为两个数组的长度。但需要注意的是，由于哈希表的散列函数可能会产生冲突，因此在极端情况下，时间复杂度可能会退化为 O(m * n)。</li></ul>]]></content>
+      
+      
+      <categories>
           
           <category> Leetcode </category>
           
