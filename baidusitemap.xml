@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.eganx.cn/2023/02/04/383.%20ransom_note/</loc>
+    <lastmod>2023-03-07</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2023/02/04/349.%20intersection_of_two_arrays/</loc>
+    <lastmod>2023-03-07</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2023/02/04/202.%20Happy_number/</loc>
+    <lastmod>2023-03-07</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.eganx.cn/2023/02/04/1.%20Two_sum/</loc>
+    <lastmod>2023-03-07</lastmod>
+  </url>
+  <url>
     <loc>https://blog.eganx.cn/2022/11/20/DB_base_%20lock_and_isolation/</loc>
     <lastmod>2022-12-31</lastmod>
   </url>
