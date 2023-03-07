@@ -333,6 +333,13 @@
   </url>
   
   <url>
+    <loc>https://blog.eganx.cn/tags/mongo/</loc>
+    <lastmod>2023-03-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://blog.eganx.cn/tags/lock/</loc>
     <lastmod>2023-03-07</lastmod>
     <changefreq>daily</changefreq>
@@ -341,13 +348,6 @@
   
   <url>
     <loc>https://blog.eganx.cn/tags/transaction/</loc>
-    <lastmod>2023-03-07</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://blog.eganx.cn/tags/mongo/</loc>
     <lastmod>2023-03-07</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
